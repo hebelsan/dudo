@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import io from 'socket.io-client';
 
 const connectionOptions =  {
@@ -11,13 +11,20 @@ const connectionOptions =  {
 const ENDPOINT = 'http://localhost:5000';
 
 const Lobby = () => {
-    //initialize socket state
+    // get player name from homepage component state
+    const location = useLocation();
+    const playerName = location.state?.playerName || '';
+
+    // get room code from url parameter
     const [searchParams, _] = useSearchParams();
     const roomCode = searchParams.get("roomCode");
+
+    //initialize socket state
     let socket;
+
     useEffect(() => {
         socket = io.connect(ENDPOINT, connectionOptions);
-        socket.emit('join', {room: roomCode});
+        socket.emit('join', { room: roomCode, name: playerName });
 
         //cleanup on component unmount
         return function cleanup() {
@@ -27,9 +34,9 @@ const Lobby = () => {
     }, [])
 
     const [users, setUsers] = useState([]);
+
     useEffect(() => {
         socket.on("lobbyData", ({ users }) => {
-            console.log(users);
             setUsers(users)
         })
     }, [])
@@ -37,7 +44,7 @@ const Lobby = () => {
 
     return (
         <div className='Lobby'>
-            {users.map((u) => <li>id: {u.id}</li>)}
+            {users.map((u) => <li key={u.id}>name: {u.name} id: {u.id}</li>)}
         </div>
     )
 }

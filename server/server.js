@@ -10,8 +10,6 @@ const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/users'
 // const cors = require('cors');
 // app.use(cors());
 
-let users = []
-
 const PORT = process.env.PORT || 5000
 
 app.use(express.static(path.resolve(__dirname, '..', 'client', 'build')))
@@ -23,13 +21,15 @@ io.on('connection', (socket) => {
     console.log(`user:${socket.id} connected`);
 
     socket.on('join', (payload) => {
+        const userRoom = payload.room;
+        const userName = payload.name === '' ? `Player${getUsersInRoom(userRoom).length+1}` : payload.name;
         const newUser = addUser({
             id: socket.id,
-            name: '',
-            room: payload.room
+            name: userName,
+            room: userRoom
         });
-        socket.join(newUser.room);
-        io.to(newUser.room).emit('lobbyData', { user: newUser, users: getUsersInRoom(newUser.room) })
+        socket.join(userRoom);
+        io.to(userRoom).emit('lobbyData', { user: newUser, users: getUsersInRoom(userRoom) })
     })
 
     socket.on('disconnect', () => {
