@@ -20,9 +20,11 @@ app.get('*', (req, res) => {
 io.on('connection', (socket) => {
     console.log(`user:${socket.id} connected`);
 
-    socket.on('join', (payload) => {
+    // LOBBY
+    socket.on('join', (payload, setNameState) => {
         const userRoom = payload.room;
         const userName = payload.name === '' ? `Player${getUsersInRoom(userRoom).length+1}` : payload.name;
+        setNameState(userName);
         const newUser = addUser({
             id: socket.id,
             name: userName,
@@ -31,7 +33,11 @@ io.on('connection', (socket) => {
         socket.join(userRoom);
         io.to(userRoom).emit('lobbyData', { user: newUser, users: getUsersInRoom(userRoom) })
     })
+    socket.on('lobbyTriggerFollowGame', (room) => {
+        io.to(room).emit('lobbyFollowGame')
+    })
 
+    // GENERAL
     socket.on('disconnect', () => {
         console.log(`user id:${socket.id} disconnected`);
         const rmUser = removeUser(socket.id);

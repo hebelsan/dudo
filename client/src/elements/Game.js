@@ -2,7 +2,7 @@ const Game = () => {
 
     return (
         <div className='Game'>
-            LOBBY
+            GAME
         </div>
     )
 }

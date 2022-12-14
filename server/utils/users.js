@@ -3,7 +3,6 @@ const users = [];
 const addUser = ({id, name, room}) => {
    const newUser = { id, name, room }
    users.push(newUser)
-   numUser++;
    return newUser;
 }
 
