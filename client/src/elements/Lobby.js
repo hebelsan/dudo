@@ -13,8 +13,8 @@ const Lobby = ({socket}) => {
     useEffect(() => {
         socket.emit('join', { room: roomCode, name: playerName }, (name) => setPlayerName(name));
 
-        // TODO remove from room
-        //cleanup on component unmount
+        // TODO disconnect from room
+        // cleanup on component unmount
         // return function cleanup() {
         //     socket.disconnect();
         //     socket.off();
@@ -30,7 +30,7 @@ const Lobby = ({socket}) => {
     }, [])
 
     const handleStartGame = () => {
-        socket.emit('lobbyTriggerFollowGame', roomCode);
+        socket.emit('startGame', roomCode);
     };
     const navigate = useNavigate();
     useEffect(() => {

@@ -5,7 +5,7 @@ const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
-const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/users')
+const { gameExists, createGame, playerJoin, playerRemove, players } = require('./utils/games')
 
 // const cors = require('cors');
 // app.use(cors());
@@ -22,26 +22,23 @@ io.on('connection', (socket) => {
 
     // LOBBY
     socket.on('join', (payload, setNameState) => {
-        const userRoom = payload.room;
-        const userName = payload.name === '' ? `Player${getUsersInRoom(userRoom).length+1}` : payload.name;
-        setNameState(userName);
-        const newUser = addUser({
-            id: socket.id,
-            name: userName,
-            room: userRoom
-        });
-        socket.join(userRoom);
-        io.to(userRoom).emit('lobbyData', { user: newUser, users: getUsersInRoom(userRoom) })
+        const playerRoom = payload.room;
+        if (! gameExists(playerRoom)) createGame(playerRoom);
+        const numPlayers = players(playerRoom).length + 1;
+        const playerName = payload.name === '' ? `Player${numPlayers}` : payload.name;
+        setNameState(playerName);
+        playerJoin(playerRoom, socket.id, playerName)
+        socket.join(playerRoom);
+        io.to(playerRoom).emit('lobbyData', { users: players(playerRoom) })
     })
-    socket.on('lobbyTriggerFollowGame', (room) => {
+    socket.on('startGame', (room) => {
         io.to(room).emit('lobbyFollowGame')
     })
 
     // GENERAL
     socket.on('disconnect', () => {
-        console.log(`user id:${socket.id} disconnected`);
-        const rmUser = removeUser(socket.id);
-        io.to(rmUser.room).emit('lobbyData', { user: rmUser, users: getUsersInRoom(rmUser.room) })
+        const {roomId ,rmPlayer} = playerRemove(socket.id);
+        io.to(roomId).emit('lobbyData', { user: rmPlayer, users: players(roomId) })
     });
 });
 

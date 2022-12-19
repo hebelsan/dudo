@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import DicesSvg from '../assets/dices.svg';
 import { v4 as uuidv4 } from 'uuid';
 
-const Homepage = () => {
+const Homepage = ({socket}) => {
     const [roomCode, setRoomCode] = useState('');
     const [playerName, setPlayerName] = useState('');
 

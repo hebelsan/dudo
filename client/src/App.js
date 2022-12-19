@@ -19,7 +19,7 @@ const App = () => {
   return (
     <div className="App">
       <Routes>
-        <Route path='/' element={<Homepage/>} />
+        <Route path='/' element={<Homepage socket={socket}/>} />
         <Route path='/lobby' element={<Lobby socket={socket}/>} />
         <Route path='/game' element={<Game socket={socket}/>} />
       </Routes>
