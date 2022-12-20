@@ -2,13 +2,17 @@
 games [
     game:
         players: [
-            {id, name}
+            {id, name, dices}
         ]
-        state:
-            currenPlayer:
-            currentBluff:
-            lastBluff:
-            numDices:
+        gameState:
+            curPlayer: int (index)
+            bet: {true, false, bet}
+            lastBet: bet
+            totalDices: int
+        sendState
+            turn: bool (is it your turn)
+            dices: [1,2,3,4,5]
+            totalDices: int
 ]
 */
 
@@ -23,6 +27,15 @@ module.exports.createGame = (roomId) => {
     games[roomId] = { players: [], state: {}};
 };
 
+module.exports.initGame = (roomId) => {
+    // TODO randomize
+    games[roomId].state.curPlayer = 0;
+    games[roomId].state.totalDices = games[roomId].players.length * 5;
+    newDices(roomId);
+
+    return games[roomId].state;
+};
+
 /*
 * Players functions
 */
@@ -31,7 +44,7 @@ module.exports.players = (roomId) => {
 }
 
 module.exports.playerJoin = (roomId, playerId, playerName) => {
-    games[roomId].players.push({id: playerId, name: playerName})
+    games[roomId].players.push({id: playerId, name: playerName, numDices: 5})
     user2Room[playerId] = roomId;
 };
 
@@ -45,4 +58,11 @@ module.exports.playerRemove = (playerId) => {
     } else {
         process.exit('player to remove not found');
     }
+}
+
+const newDices = (roomId) => {
+    games[roomId].players.forEach((player) => { 
+        if (player.numDices > 0)
+            player.dices = Array.from({length: player.numDices}, () => Math.trunc(Math.random()*6) + 1)
+    });
 }
