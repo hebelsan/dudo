@@ -6,14 +6,15 @@ games [
         ]
         state:
             curPlayer: int (index)
-            bet: {true, false, bet}
-            lastBet: bet
+            bid: (true, false, bid)
+            lastBid: bid
             totalDices: int
         sendState
             turn: bool (is it your turn)
             dices: [1,2,3,4,5]
             totalDices: int
             curPlayer: string
+            lastBid: bid, undefined
 ]
 */
 
@@ -31,6 +32,7 @@ module.exports.createGame = (roomId) => {
 module.exports.initGame = (roomId) => {
     // TODO randomize first player and players position
     games[roomId].state.curPlayer = 0;
+    games[roomId].state.lastBid = undefined;
     games[roomId].state.totalDices = games[roomId].players.length * 5;
     newDices(roomId);
 };
@@ -41,7 +43,8 @@ module.exports.sendGameState = (roomId, io, event='newGameState') => {
             turn: index == games[roomId].state.curPlayer,
             dices: player.dices,
             totalDices: games[roomId].state.totalDices,
-            curPlayer: games[roomId].players[games[roomId].state.curPlayer].name
+            curPlayer: games[roomId].players[games[roomId].state.curPlayer].name,
+            lastBid: games[roomId].state
         }
         io.to(player.id).emit(event, sendState);
     });

@@ -23,6 +23,27 @@ const Game = ({socket}) => {
             <div>Total number of dices: {gameState.curPlayer}</div>
             <div>your dices: {gameState.dices}</div>
             <div>your turn: {String(gameState.turn)}</div>
+            <div>
+                <button type="button">
+                    True
+                </button>
+                <button type="button">
+                    False
+                </button>
+                <input type="number" id="multiplier" name="multiplier" min="1" max={gameState.totalDices} />
+                x
+                <select name="diceValue" id="diceValue">
+                    <option value="ones">ones</option>
+                    <option value="twos">twos</option>
+                    <option value="threes">threes</option>
+                    <option value="fours">fours</option>
+                    <option value="fives">fives</option>
+                    <option value="sixs">sixs</option>
+                </select>
+                <button type="button">
+                    Bid
+                </button>
+            </div>
         </div>
     )
 }
