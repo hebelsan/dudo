@@ -44,7 +44,7 @@ module.exports.sendGameState = (roomId, io, event='newGameState') => {
             dices: player.dices,
             totalDices: games[roomId].state.totalDices,
             curPlayer: games[roomId].players[games[roomId].state.curPlayer].name,
-            lastBid: games[roomId].state
+            lastBid: games[roomId].state.lastBid
         }
         io.to(player.id).emit(event, sendState);
     });

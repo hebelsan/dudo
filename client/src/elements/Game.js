@@ -1,6 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 
+/**
+GameState:
+    turn: bool (is it your turn)
+    dices: [1,2,3,4,5]
+    totalDices: int
+    curPlayer: string
+    lastBid: bid, undefined
+*/
+
+/**
+ * bidExample = {times: 5, dice: 6}
+ */
+
 const Game = ({socket}) => {
     // get room code from url parameter
     const [searchParams, _] = useSearchParams();
@@ -12,35 +25,54 @@ const Game = ({socket}) => {
     
     useEffect(() => {
         socket.on('newGameState', (newGameState) => {
-            console.log(newGameState);
             setGameState({...gameState, ...newGameState});
         })
     }, [])
 
+    const handleBidDecision = (decision) => {
+        console.log(`bid: ${decision}`);
+        socket.emit('updateGame', {bid: decision});
+    };
+
+    // TODO creat and put into dedicated component for userInput
+    const [inputMulitplier, setInputMulitplier] = useState(1);
+    const [inputDice, setInputDice] = useState(1);
+
+    const isValidBid = () => {
+        const bid = {times: inputMulitplier, dice: inputDice}
+        const lastBid = gameState.lastBid;
+        return (
+            inputMulitplier != 0 && inputDice != 0) &&
+                (!lastBid || 
+                    // newBid greater last bid
+                    (lastBid.dice != 1 && (bid.times > lastBid.times || bid.dices > lastBid.dices) || 
+                    (lastBid.dice == 1 && bid.times > 2*lastBid.times))
+        );
+    }
+
     return (
         <div className='Game'>
             <div>Total number of dices: {gameState.totalDices}</div>
-            <div>Total number of dices: {gameState.curPlayer}</div>
+            <div>Current Player: {gameState.curPlayer}</div>
             <div>your dices: {gameState.dices}</div>
             <div>your turn: {String(gameState.turn)}</div>
-            <div>
-                <button type="button">
+            <div className='decisionInput' style={{visibility: gameState.turn ? 'visible' : 'hidden' }}>
+                <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(true)}>
                     True
                 </button>
-                <button type="button">
+                <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(false)}>
                     False
                 </button>
-                <input type="number" id="multiplier" name="multiplier" min="1" max={gameState.totalDices} />
-                x
-                <select name="diceValue" id="diceValue">
-                    <option value="ones">ones</option>
-                    <option value="twos">twos</option>
-                    <option value="threes">threes</option>
-                    <option value="fours">fours</option>
-                    <option value="fives">fives</option>
-                    <option value="sixs">sixs</option>
+                <input type="number" id="multiplier" name="multiplier" min="1" max={gameState.totalDices} value={inputMulitplier} onChange={e => setInputMulitplier(e.target.value)} />
+                <select name="diceValue" id="diceValue" onChange={e => setInputDice(e.target.value)} value={inputDice}>
+                    <option value="1">ones</option>
+                    <option value="2">twos</option>
+                    <option value="3">threes</option>
+                    <option value="4">fours</option>
+                    <option value="5">fives</option>
+                    <option value="6">sixs</option>
                 </select>
-                <button type="button">
+                <button type="button" disabled={!isValidBid()} onClick={() => handleBidDecision({times: inputMulitplier, dice: inputDice})}>
                     Bid
                 </button>
             </div>
