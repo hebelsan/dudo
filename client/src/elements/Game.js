@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
+import * as bid from '../utils/bid';
 
 /**
 GameState:
@@ -30,7 +31,6 @@ const Game = ({socket}) => {
     }, [])
 
     const handleBidDecision = (decision) => {
-        console.log(`bid: ${decision}`);
         socket.emit('updateGame', {bid: decision});
     };
 
@@ -39,14 +39,11 @@ const Game = ({socket}) => {
     const [inputDice, setInputDice] = useState(1);
 
     const isValidBid = () => {
-        const bid = {times: inputMulitplier, dice: inputDice}
+        const currBid = {times: inputMulitplier, dice: inputDice}
         const lastBid = gameState.lastBid;
         return (
-            inputMulitplier != 0 && inputDice != 0) &&
-                (!lastBid || 
-                    // newBid greater last bid
-                    (lastBid.dice != 1 && (bid.times > lastBid.times || bid.dices > lastBid.dices) || 
-                    (lastBid.dice == 1 && bid.times > 2*lastBid.times))
+            (inputMulitplier != 0 && inputDice != 0) &&
+            (!lastBid || bid.isGreater(currBid, lastBid))
         );
     }
 
