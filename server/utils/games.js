@@ -6,9 +6,9 @@ games [
         ]
         state:
             curPlayer: int (index)
-            bid: (true, false, bid)
             lastBid: bid
             totalDices: int
+            newDices: bool
         sendState
             turn: bool (is it your turn)
             dices: [1,2,3,4,5]
@@ -20,7 +20,11 @@ games [
 
 const games = {};
 const user2Room = {};
+const PLAYERS_DICES = 5;
 
+/*
+* Game creation
+*/
 module.exports.gameExists = (roomId) => {
     return games[roomId] ? true : false;
 };
@@ -32,12 +36,14 @@ module.exports.createGame = (roomId) => {
 module.exports.initGame = (roomId) => {
     // TODO randomize first player and players position
     games[roomId].state.curPlayer = 0;
+    games[roomId].state.newDices = true;
     games[roomId].state.lastBid = undefined;
-    games[roomId].state.totalDices = games[roomId].players.length * 5;
-    newDices(roomId);
+    games[roomId].state.totalDices = games[roomId].players.length * PLAYERS_DICES;
 };
 
 module.exports.sendGameState = (roomId, io, event='newGameState') => {
+    if (games[roomId].state.newDices)
+        newDices(roomId);
     games[roomId].players.forEach((player, index) => {
         const sendState = {
             turn: index == games[roomId].state.curPlayer,
@@ -51,6 +57,19 @@ module.exports.sendGameState = (roomId, io, event='newGameState') => {
 };
 
 /*
+* Game updates
+*/
+module.exports.updateGame = (playerId, state) => {
+    const roomId = user2Room[playerId];
+    if (state.bid) {
+        const roundState = getRoundState(roomId, state.bid);
+        applyRoundState(roomId, roundState, state.bid);
+    }
+    return roomId;
+};
+
+
+/*
 * Players functions
 */
 module.exports.players = (roomId) => {
@@ -58,7 +77,7 @@ module.exports.players = (roomId) => {
 }
 
 module.exports.playerJoin = (roomId, playerId, playerName) => {
-    games[roomId].players.push({id: playerId, name: playerName, numDices: 5})
+    games[roomId].players.push({id: playerId, name: playerName, numDices: PLAYERS_DICES})
     user2Room[playerId] = roomId;
 };
 
@@ -73,10 +92,65 @@ module.exports.playerRemove = (playerId) => {
         process.exit('player to remove not found');
     }
 }
+const nextPlayer = (roomId) => {
+    const curPlayer = games[roomId].state.curPlayer;
+    const numPlayers = games[roomId].players.length;
+    if ((curPlayer + 1) < numPlayers)
+        return curPlayer + 1;
+    return 0;
+}
+
+/*
+* helpers
+*/
 
 const newDices = (roomId) => {
     games[roomId].players.forEach((player) => { 
         if (player.numDices > 0)
             player.dices = Array.from({length: player.numDices}, () => Math.trunc(Math.random()*6) + 1)
     });
+    games[roomId].state.newDices = false;
+}
+
+const ROUND_STATE = {
+    NEXT: "next", // next player (lastBid = curBid + curPlayer update)
+    CUR_PLAYER_LOSE: "cur_player_lose", // (lose a dice + start new round + lastBid = undefined)
+    PLAYER_BEFORE_LOSE:"player_before_lose", // (the player before looses a dice but starts round ) 
+    WIN: "win", // (it's your turn but you don't win a dice) 
+    WIN_GAIN: "win_gain" // (it's your turn and you win a dice)
+}
+// returns ROUND_STATE
+const getRoundState = (roomId, newBid) => {
+    if ( typeof newBid === 'object' && newBid !== null)
+        return ROUND_STATE.NEXT;
+    const lastBid = games[roomId].state.lastBid;
+    const allDices = games[roomId].players.map((player) => player.dices).flat();
+    const numBidDices = allDices.filter(dice => lastBid.dice === dice || dice === 1).length;
+    if (newBid === true) {
+        const curTotalDices = games[roomId].state.totalDices;
+        const maxDices = games[roomId].players.length * PLAYERS_DICES;
+        if (numBidDices === lastBid.times && curTotalDices >= maxDices/2)
+            return ROUND_STATE.WIN_GAIN;
+        if (numBidDices === lastBid.times)
+            return ROUND_STATE.WIN;
+        else
+            return ROUND_STATE.CUR_PLAYER_LOSE;
+    } else if (newBid === false) {
+        if (numBidDices >= lastBid.times)
+            return ROUND_STATE.PLAYER_BEFORE_LOSE;
+        else
+            return ROUND_STATE.CUR_PLAYER_LOSE;
+    } else
+        console.error("something is wrong with the bid...");
+}
+const applyRoundState = (roomId, roundState, newBid) => {
+    switch(roundState) {
+        case ROUND_STATE.NEXT:
+            games[roomId].state.lastBid = newBid;
+            games[roomId].state.curPlayer = nextPlayer(roomId);
+            break;
+        case ROUND_STATE.CUR_PLAYER_LOSE:
+          // code block
+          break;
+    }
 }

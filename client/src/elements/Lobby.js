@@ -35,13 +35,14 @@ const Lobby = ({socket}) => {
     const navigate = useNavigate();
     useEffect(() => {
         socket.on('lobbyFollowGame', (gameState) => {
-            navigate(`/game?roomCode=${roomCode}`, {state:{playerName:playerName, gameState:gameState}});
+            navigate(`/game?roomCode=${roomCode}`, {state:{player:playerName, gameState:gameState}});
         })
-    }, [])
+    }, [playerName])
 
 
     return (
         <div className='Lobby'>
+            <h1>Lobby</h1>
             <button type="button" onClick={handleStartGame} value={socket}>
                 START GAME
             </button>

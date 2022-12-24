@@ -22,10 +22,11 @@ const Game = ({socket}) => {
 
     const location = useLocation();
     const [gameState, setGameState] = useState(location.state.gameState);
-    const [playerName, setPlayerName] = useState(location.state.playerName);
+    const [playerName, setPlayerName] = useState(location.state.player);
     
     useEffect(() => {
         socket.on('newGameState', (newGameState) => {
+            console.log(newGameState);
             setGameState({...gameState, ...newGameState});
         })
     }, [])
@@ -49,6 +50,7 @@ const Game = ({socket}) => {
 
     return (
         <div className='Game'>
+            <div>Your Name: {playerName}</div>
             <div>Total number of dices: {gameState.totalDices}</div>
             <div>Current Player: {gameState.curPlayer}</div>
             <div>your dices: {gameState.dices}</div>

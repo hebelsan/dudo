@@ -5,7 +5,7 @@ const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
-const { gameExists, createGame, playerJoin, playerRemove, players, initGame, sendGameState } = require('./utils/games')
+const { gameExists, createGame, playerJoin, playerRemove, players, initGame, sendGameState, updateGame } = require('./utils/games')
 
 // const cors = require('cors');
 // app.use(cors());
@@ -34,6 +34,12 @@ io.on('connection', (socket) => {
     socket.on('startGame', (room) => {
         initGame(room);
         sendGameState(room, io, 'lobbyFollowGame');
+    })
+
+    // GAME
+    socket.on('updateGame', (state) => {
+        const room = updateGame(socket.id, state);
+        sendGameState(room, io);
     })
 
     // GENERAL
