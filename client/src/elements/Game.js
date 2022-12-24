@@ -55,6 +55,7 @@ const Game = ({socket}) => {
             <div>Current Player: {gameState.curPlayer}</div>
             <div>your dices: {gameState.dices}</div>
             <div>your turn: {String(gameState.turn)}</div>
+            <div>last bid: {JSON.stringify(gameState.lastBid)}</div>
             <div className='decisionInput' style={{visibility: gameState.turn ? 'visible' : 'hidden' }}>
                 <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(true)}>
                     True
