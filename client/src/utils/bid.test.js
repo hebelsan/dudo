@@ -29,3 +29,19 @@ it('compare bid greater compareDice is one and bidDice is not one', () => {
 it('compare bid greater compareDice is one and bid dice is one', () => {
     expect(bid.isGreater(bid.create(4, 1), bid.create(3, 1))).toEqual(true);
 });
+
+it('compareDice is one but still greater', () => {
+    expect(bid.isGreater(bid.create(4, 2), bid.create(4, 1))).toEqual(false);
+});
+
+it('compareDice is one but still greater', () => {
+    expect(bid.isGreater(bid.create(5, 1), bid.create(4, 1))).toEqual(true);
+});
+
+it('higher dice is always higher', () => {
+    expect(bid.isGreater(bid.create(3, 2), bid.create(2, 3))).toEqual(true);
+});
+
+it('test', () => {
+    expect(bid.isGreater(bid.create(2, 1), bid.create(3, 6))).toEqual(true);
+});

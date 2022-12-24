@@ -63,8 +63,8 @@ const Game = ({socket}) => {
                 <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(false)}>
                     False
                 </button>
-                <input type="number" id="multiplier" name="multiplier" min="1" max={gameState.totalDices} value={inputMulitplier} onChange={e => setInputMulitplier(e.target.value)} />
-                <select name="diceValue" id="diceValue" onChange={e => setInputDice(e.target.value)} value={inputDice}>
+                <input type="number" id="multiplier" name="multiplier" min="1" max={gameState.totalDices} value={inputMulitplier} onChange={e => setInputMulitplier(parseInt(e.target.value))} />
+                <select name="diceValue" id="diceValue" onChange={e => setInputDice(parseInt(e.target.value))} value={inputDice}>
                     <option value="1">ones</option>
                     <option value="2">twos</option>
                     <option value="3">threes</option>
