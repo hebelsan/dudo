@@ -145,9 +145,9 @@ const getRoundState = (roomId, newBid) => {
             return ROUND_STATE.CUR_PLAYER_LOSE;
     } else if (newBid === false) {
         if (numBidDices >= lastBid.times)
-            return ROUND_STATE.PLAYER_BEFORE_LOSE;
-        else
             return ROUND_STATE.CUR_PLAYER_LOSE;
+        else
+            return ROUND_STATE.PLAYER_BEFORE_LOSE;
     } else
         console.error("something is wrong with the bid...");
 }
