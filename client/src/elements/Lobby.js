@@ -12,14 +12,6 @@ const Lobby = ({socket}) => {
 
     useEffect(() => {
         socket.emit('join', { room: roomCode, name: playerName }, (name) => setPlayerName(name));
-
-        // TODO disconnect from room
-        // cleanup on component unmount
-        // return function cleanup() {
-        //     socket.disconnect();
-        //     socket.off();
-        // }
-
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
