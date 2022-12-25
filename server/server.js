@@ -10,7 +10,7 @@ const { gameExists, createGame, playerJoin, playerRemove, players, initGame, sen
 // const cors = require('cors');
 // app.use(cors());
 
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT_SOCKET || 5000
 
 app.use(express.static(path.resolve(__dirname, '..', 'client', 'build')))
 app.get('*', (req, res) => {
@@ -50,5 +50,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
-  console.log('listening on *:5000');
+  console.log(`listening on *:${PORT}`);
 });

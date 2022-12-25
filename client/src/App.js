@@ -11,7 +11,11 @@ const connectionOptions =  {
     "timeout" : 10000,                  
     "transports" : ["websocket"]
 };
-const ENDPOINT = 'http://localhost:5000';
+
+const ENDPOINT = (process.env.REACT_APP_SOCKET_HOST && process.env.REACT_APP_SOCKET_PORT ) ? 
+  `http://${process.env.REACT_APP_SOCKET_HOST}:${process.env.REACT_APP_SOCKET_PORT}` : 
+  'http://localhost:5000';
+console.log(ENDPOINT);
 
 const socket = io.connect(ENDPOINT, connectionOptions);
 
