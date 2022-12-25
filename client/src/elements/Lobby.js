@@ -43,7 +43,7 @@ const Lobby = ({socket}) => {
     return (
         <div className='Lobby'>
             <h1>Lobby</h1>
-            <button type="button" onClick={handleStartGame} value={socket}>
+            <button type="button" onClick={handleStartGame} value={socket} disabled={users.length<=1}>
                 START GAME
             </button>
             {users.map((u) => <li key={u.id}>name: {u.name} id: {u.id}</li>)}
