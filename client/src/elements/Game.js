@@ -25,6 +25,7 @@ const Game = ({socket}) => {
         socket.on('newGameState', (newGameState) => {
             setGameState({...gameState, ...newGameState});
         })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleBidDecision = (decision) => {

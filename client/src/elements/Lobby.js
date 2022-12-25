@@ -7,7 +7,7 @@ const Lobby = ({socket}) => {
     const [playerName, setPlayerName] = useState(location.state?.playerName || '');
 
     // get room code from url parameter
-    const [searchParams, _] = useSearchParams();
+    const [searchParams] = useSearchParams();
     const roomCode = searchParams.get("roomCode");
 
     useEffect(() => {
@@ -19,6 +19,8 @@ const Lobby = ({socket}) => {
         //     socket.disconnect();
         //     socket.off();
         // }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const [users, setUsers] = useState([]);
@@ -27,6 +29,7 @@ const Lobby = ({socket}) => {
         socket.on('lobbyData', ({ users }) => {
             setUsers(users)
         })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleStartGame = () => {
@@ -37,6 +40,7 @@ const Lobby = ({socket}) => {
         socket.on('lobbyFollowGame', (gameState) => {
             navigate(`/game?roomCode=${roomCode}`, {state:{player:playerName, gameState:gameState}});
         })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playerName])
 
 

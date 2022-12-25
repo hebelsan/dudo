@@ -19,6 +19,8 @@ export function getDiceImg(dice_value) {
             return dice_5_img;
         case 6:
             return dice_6_img;
+        default:
+            process.exit(`unsupported dice value: ${dice_value}`)
     }
 }
 
