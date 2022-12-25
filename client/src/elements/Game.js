@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import * as bid from '../utils/bid';
 import { getDiceImg } from '../utils/images';
 
@@ -17,17 +17,12 @@ GameState:
  */
 
 const Game = ({socket}) => {
-    // get room code from url parameter
-    const [searchParams, _] = useSearchParams();
-    const roomCode = searchParams.get("roomCode");
-
     const location = useLocation();
     const [gameState, setGameState] = useState(location.state.gameState);
-    const [playerName, setPlayerName] = useState(location.state.player);
+    const playerName = location.state.player;
     
     useEffect(() => {
         socket.on('newGameState', (newGameState) => {
-            console.log(newGameState);
             setGameState({...gameState, ...newGameState});
         })
     }, [])
@@ -44,7 +39,7 @@ const Game = ({socket}) => {
         const currBid = {times: inputMulitplier, dice: inputDice}
         const lastBid = gameState.lastBid;
         return (
-            (inputMulitplier != 0 && inputDice != 0) &&
+            (inputMulitplier !== 0 && inputDice !== 0) &&
             (!lastBid || bid.isGreater(currBid, lastBid))
         );
     }

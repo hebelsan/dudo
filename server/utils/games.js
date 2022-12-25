@@ -162,16 +162,16 @@ const applyRoundState = (roomId, roundState, newBid) => {
             games[roomId].state.curPlayer = nextPlayer(roomId);
             break;
         case ROUND_STATE.CUR_PLAYER_LOSE:
-            games[roomId].state.lastBid = undefined;
             games[roomId].players[games[roomId].state.curPlayer].numDices--;
             games[roomId].state.totalDices--;
+            games[roomId].state.lastBid = undefined;
             games[roomId].state.newDices = true;
             break;
         case ROUND_STATE.PLAYER_BEFORE_LOSE:
             const playerBefore = lastPlayer(roomId);
-            games[roomId].state.lastBid = undefined;
             games[roomId].players[playerBefore].numDices--;
             games[roomId].state.totalDices--;
+            games[roomId].state.lastBid = undefined;
             games[roomId].state.newDices = true;
             games[roomId].state.curPlayer = playerBefore;
             break;
@@ -180,9 +180,9 @@ const applyRoundState = (roomId, roundState, newBid) => {
             games[roomId].state.newDices = true;
             break;
         case ROUND_STATE.WIN_GAIN:
+            games[roomId].players[games[roomId].state.curPlayer].numDices++;
             games[roomId].state.lastBid = undefined;
             games[roomId].state.newDices = true;
-            games[roomId].players[games[roomId].state.curPlayer].numDices++;
             games[roomId].state.totalDices++;
             break;
     }
