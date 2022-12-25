@@ -2,11 +2,11 @@
  * bidExample = {times: 5, dice: 6}
  */
 
-module.exports.create = function(multiplier, diceValue) {
+export function create(multiplier, diceValue) {
     return { times: multiplier, dice: diceValue }
 }
 
-module.exports.isGreater = function(bid, bidToCompare) {
+export function isGreater(bid, bidToCompare) {
     return (
         (bidToCompare.dice !== 1 && (
             (bid.times > bidToCompare.times) ||

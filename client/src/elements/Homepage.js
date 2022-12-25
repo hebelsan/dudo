@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import DicesSvg from '../assets/dices.svg';
+import DicesSvg from '../assets/logo.svg';
 import { v4 as uuidv4 } from 'uuid';
 
 const Homepage = ({socket}) => {

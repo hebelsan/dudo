@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import * as bid from '../utils/bid';
+import { getDiceImg } from '../utils/images';
 
 /**
 GameState:
@@ -53,9 +54,12 @@ const Game = ({socket}) => {
             <div>Your Name: {playerName}</div>
             <div>Total number of dices: {gameState.totalDices}</div>
             <div>Current Player: {gameState.curPlayer}</div>
-            <div>your dices: {gameState.dices}</div>
             <div>your turn: {String(gameState.turn)}</div>
             <div>last bid: {JSON.stringify(gameState.lastBid)}</div>
+
+            <div>your dices: {gameState.dices}</div>
+            <div>{gameState.dices.map((dice) => <img src={getDiceImg(dice)} width='50' alt={'dice'}/>) }</div>
+
             <div className='decisionInput' style={{visibility: gameState.turn ? 'visible' : 'hidden' }}>
                 <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(true)}>
                     True
