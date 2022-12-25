@@ -89,8 +89,12 @@ module.exports.playerRemove = (playerId) => {
         const rmPlayer = games[roomId].players.splice(removeIndex, 1)[0]
         return {roomId, rmPlayer};
     } else {
-        process.exit('player to remove not found');
+        console.error('player to remove not found');
     }
+}
+
+module.exports.playerIsInGame = (playerId) => {
+    return user2Room[playerId]
 }
 
 const nextPlayer = (roomId) => {
