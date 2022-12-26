@@ -2,7 +2,7 @@
 games [
     game:
         players: [
-            {id, name, dices, numDices}
+            {id (string), name(string), dices(arr), numDices(int)}
         ]
         state:
             curPlayer: int (index)
@@ -97,29 +97,28 @@ module.exports.playerIsInGame = (playerId) => {
     return user2Room[playerId]
 }
 
-const nextPlayer = (roomId) => {
-    const curPlayer = games[roomId].state.curPlayer;
-    const numPlayers = games[roomId].players.length;
-    if ((curPlayer + 1) < numPlayers)
-        return curPlayer + 1;
-    return 0;
+const nextPlayer = (players, curPlayer, numPlayers, increment=0) => {
+    let n_player; // potentialNextBefore
+    if (curPlayer >= numPlayers)
+        n_player = 0;
+    else if (curPlayer < 0)
+        n_player = numPlayers - 1;
+    else
+        n_player = curPlayer;
+    if (isPlayerGameOver(players, n_player))
+        return nextPlayer(players, n_player+increment, numPlayers)
+    return n_player;
 }
-const lastPlayer = (roomId) => {
-    const curPlayer = games[roomId].state.curPlayer;
-    const numPlayers = games[roomId].players.length;
-    if ((curPlayer - 1) < 0)
-        return numPlayers - 1;
-    return curPlayer - 1;
+const isPlayerGameOver = (players, arrIdx) => {
+    return (players[arrIdx].numDices) === 0;
 }
 
 /*
 * helpers
 */
-
 const newDices = (roomId) => {
     games[roomId].players.forEach((player) => { 
-        if (player.numDices > 0)
-            player.dices = Array.from({length: player.numDices}, () => Math.trunc(Math.random()*6) + 1)
+        player.dices = Array.from({length: player.numDices}, () => Math.trunc(Math.random()*6) + 1)
     });
     games[roomId].state.newDices = false;
 }
@@ -135,6 +134,7 @@ const ROUND_STATE = {
 const getRoundState = (roomId, newBid) => {
     if ( typeof newBid === 'object' && newBid !== null)
         return ROUND_STATE.NEXT;
+    console.log(games[roomId].state);
     const lastBid = games[roomId].state.lastBid;
     const allDices = games[roomId].players.map((player) => player.dices).flat();
     const numBidDices = allDices.filter(dice => lastBid.dice === dice || dice === 1).length;
@@ -156,24 +156,28 @@ const getRoundState = (roomId, newBid) => {
         console.error("something is wrong with the bid...");
 }
 const applyRoundState = (roomId, roundState, newBid) => {
+    const curPlayer = games[roomId].state.curPlayer;
+    const numPlayers = games[roomId].players.length;
     switch(roundState) {
         case ROUND_STATE.NEXT:
             games[roomId].state.lastBid = newBid;
-            games[roomId].state.curPlayer = nextPlayer(roomId);
+            games[roomId].state.curPlayer = nextPlayer(games[roomId].players, curPlayer+1, numPlayers, 1);
             break;
         case ROUND_STATE.CUR_PLAYER_LOSE:
             games[roomId].players[games[roomId].state.curPlayer].numDices--;
+            games[roomId].state.curPlayer = nextPlayer(games[roomId].players, curPlayer, numPlayers, 1);
             games[roomId].state.totalDices--;
             games[roomId].state.lastBid = undefined;
             games[roomId].state.newDices = true;
             break;
         case ROUND_STATE.PLAYER_BEFORE_LOSE:
-            const playerBefore = lastPlayer(roomId);
+            const playerBefore = nextPlayer(games[roomId].players, curPlayer-1, numPlayers, -1);
             games[roomId].players[playerBefore].numDices--;
             games[roomId].state.totalDices--;
             games[roomId].state.lastBid = undefined;
             games[roomId].state.newDices = true;
-            games[roomId].state.curPlayer = playerBefore;
+            if (!isPlayerGameOver(games[roomId].players, playerBefore))
+                games[roomId].state.curPlayer = playerBefore;
             break;
         case ROUND_STATE.WIN:
             games[roomId].state.lastBid = undefined;

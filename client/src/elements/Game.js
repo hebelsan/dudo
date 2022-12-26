@@ -56,6 +56,8 @@ const Game = ({socket}) => {
             <div>your dices: {gameState.dices}</div>
             <div>{gameState.dices.map((dice) => <img src={getDiceImg(dice)} width='50' alt={'dice'}/>) }</div>
 
+            <div>{gameState.dices.length === 0 ? <b>you lose!</b>: ""}</div>
+
             <div className='decisionInput' style={{visibility: gameState.turn ? 'visible' : 'hidden' }}>
                 <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(true)}>
                     True
