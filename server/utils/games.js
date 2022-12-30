@@ -46,6 +46,7 @@ module.exports.initGame = (roomId) => {
 */
 module.exports.updateGame = (playerId, state) => {
     const roomId = user2Room[playerId];
+    console.log(`updateGame room: ${roomId}`);
     if (state.hasOwnProperty('bid')) {
         const roundState = getRoundState(roomId, state.bid);
         applyRoundState(roomId, roundState, state.bid);

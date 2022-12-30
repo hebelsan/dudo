@@ -19,11 +19,15 @@ GameState:
 const Game = ({socket}) => {
     const location = useLocation();
     const [gameState, setGameState] = useState(location.state.gameState);
+    const [inputMulitplier, setInputMulitplier] = useState(1);
+    const [inputDice, setInputDice] = useState(1);
     const playerName = location.state.player;
     
     useEffect(() => {
         socket.on('newGameState', (newGameState) => {
             setGameState({...gameState, ...newGameState});
+            setInputMulitplier(newGameState.lastBid?.times || 1);
+            setInputDice(newGameState.lastBid?.dice || 1);
         })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -31,10 +35,6 @@ const Game = ({socket}) => {
     const handleBidDecision = (decision) => {
         socket.emit('updateGame', {bid: decision});
     };
-
-    // TODO creat and put into dedicated component for userInput
-    const [inputMulitplier, setInputMulitplier] = useState(1);
-    const [inputDice, setInputDice] = useState(1);
 
     const isValidBid = () => {
         const currBid = {times: inputMulitplier, dice: inputDice}
@@ -54,7 +54,7 @@ const Game = ({socket}) => {
             <div>last bid: {JSON.stringify(gameState.lastBid)}</div>
 
             <div>your dices: {gameState.dices}</div>
-            <div>{gameState.dices.map((dice) => <img src={getDiceImg(dice)} width='50' alt={'dice'}/>) }</div>
+            <div>{gameState.dices.map((dice, idx) => <img key={'dice' + idx} src={getDiceImg(dice)} width='50' alt={'dice' + idx}/>) }</div>
 
             <div>{gameState.dices.length === 0 ? <b>you lose!</b>: ""}</div>
 
