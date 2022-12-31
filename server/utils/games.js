@@ -36,12 +36,13 @@ module.exports.createGame = (roomId) => {
 };
 
 module.exports.initGame = (roomId) => {
+    const game = games[roomId];
     // TODO randomize first player and players position
-    games[roomId].state.curPlayer = 0;
-    games[roomId].state.newDices = true;
-    games[roomId].state.lastBid = undefined;
-    games[roomId].state.won = undefined;
-    games[roomId].state.totalDices = games[roomId].players.length * PLAYERS_DICES;
+    game.state.curPlayer = 0;
+    game.state.newDices = true;
+    game.state.lastBid = undefined;
+    game.state.won = undefined;
+    game.state.totalDices = game.players.length * PLAYERS_DICES;
 };
 
 /*
@@ -52,6 +53,7 @@ module.exports.updateGame = (playerId, state) => {
     console.log(`updateGame room: ${roomId}`);
     if (!roomId) {
         console.error(`can't find roomId to player: ${playerId}`)
+        return;
     }
     const game = games[roomId];
     if (state.hasOwnProperty('bid')) {
@@ -62,16 +64,21 @@ module.exports.updateGame = (playerId, state) => {
 };
 
 module.exports.sendGameState = (roomId, io, event='newGameState') => {
-    if (games[roomId].state.newDices)
-        newDices(roomId);
-    games[roomId].players.forEach((player, index) => {
+    const game = games[roomId];
+    if (!roomId || !game) {
+        console.error(`can't find game to roomId: ${roomId}`);
+        return;
+    }
+    if (game.state.newDices)
+        newDices(game);
+    game.players.forEach((player, index) => {
         let sendState = {
             dices: player.dices,
-            turn: index == games[roomId].state.curPlayer,
-            totalDices: games[roomId].state.totalDices,
-            curPlayer: games[roomId].players[games[roomId].state.curPlayer].name,
-            lastBid: games[roomId].state.lastBid,
-            won: games[roomId].state.won
+            turn: index == game.state.curPlayer,
+            totalDices: game.state.totalDices,
+            curPlayer: game.players[game.state.curPlayer].name,
+            lastBid: game.state.lastBid,
+            won: game.state.won
         }
         io.to(player.id).emit(event, sendState);
     });
@@ -136,11 +143,11 @@ const playerRemoveDice = (game, idx) => {
 /*
 * helpers
 */
-const newDices = (roomId) => {
-    games[roomId].players.forEach((player) => { 
+const newDices = (game) => {
+    game.players.forEach((player) => { 
         player.dices = Array.from({length: player.numDices}, () => Math.trunc(Math.random()*6) + 1)
     });
-    games[roomId].state.newDices = false;
+    game.state.newDices = false;
 }
 
 const ROUND_STATE = {
