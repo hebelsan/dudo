@@ -53,12 +53,13 @@ const Game = ({socket}) => {
             <div>your turn: {String(gameState.turn)}</div>
             <div>last bid: {JSON.stringify(gameState.lastBid)}</div>
 
+            <div>{gameState.dices.length === 0 ? <b>you lose!</b>: ""}</div>
+            <div>{gameState.won === playerName ? <b>you win!</b>: ""}</div>
+
             <div>your dices: {gameState.dices}</div>
             <div>{gameState.dices.map((dice, idx) => <img key={'dice' + idx} src={getDiceImg(dice)} width='50' alt={'dice' + idx}/>) }</div>
 
-            <div>{gameState.dices.length === 0 ? <b>you lose!</b>: ""}</div>
-
-            <div className='decisionInput' style={{visibility: gameState.turn ? 'visible' : 'hidden' }}>
+            <div className='decisionInput' style={{visibility: gameState.turn && !(gameState.won === playerName) ? 'visible' : 'hidden' }}>
                 <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(true)}>
                     True
                 </button>

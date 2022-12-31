@@ -9,12 +9,14 @@ games [
             lastBid: bid
             totalDices: int
             newDices: bool
+            won: undefined | string
         sendState
             turn: bool (is it your turn)
             dices: [1,2,3,4,5]
             totalDices: int
             curPlayer: string
             lastBid: bid
+            won: string
 ]
 */
 
@@ -38,6 +40,7 @@ module.exports.initGame = (roomId) => {
     games[roomId].state.curPlayer = 0;
     games[roomId].state.newDices = true;
     games[roomId].state.lastBid = undefined;
+    games[roomId].state.won = undefined;
     games[roomId].state.totalDices = games[roomId].players.length * PLAYERS_DICES;
 };
 
@@ -58,12 +61,13 @@ module.exports.sendGameState = (roomId, io, event='newGameState') => {
     if (games[roomId].state.newDices)
         newDices(roomId);
     games[roomId].players.forEach((player, index) => {
-        const sendState = {
-            turn: index == games[roomId].state.curPlayer,
+        let sendState = {
             dices: player.dices,
+            turn: index == games[roomId].state.curPlayer,
             totalDices: games[roomId].state.totalDices,
             curPlayer: games[roomId].players[games[roomId].state.curPlayer].name,
-            lastBid: games[roomId].state.lastBid
+            lastBid: games[roomId].state.lastBid,
+            won: games[roomId].state.won
         }
         io.to(player.id).emit(event, sendState);
     });
@@ -112,6 +116,17 @@ const nextPlayer = (players, curPlayer, numPlayers, increment=0) => {
 }
 const isPlayerGameOver = (players, arrIdx) => {
     return (players[arrIdx].numDices) === 0;
+}
+
+const playerRemoveDice = (roomId, idx) => {
+    games[roomId].players[idx].numDices--;
+    games[roomId].state.totalDices--;
+    if (games[roomId].players[idx].numDices == 0) {
+        const playersAlive = games[roomId].players.filter((player) => player.numDices !== 0);
+        if (playersAlive.length === 1) {
+            games[roomId].state.won = playersAlive[0].name;
+        }
+    }
 }
 
 /*
@@ -165,16 +180,14 @@ const applyRoundState = (roomId, roundState, newBid) => {
             games[roomId].state.curPlayer = nextPlayer(games[roomId].players, curPlayer+1, numPlayers, 1);
             break;
         case ROUND_STATE.CUR_PLAYER_LOSE:
-            games[roomId].players[games[roomId].state.curPlayer].numDices--;
+            playerRemoveDice(roomId, games[roomId].state.curPlayer);
             games[roomId].state.curPlayer = nextPlayer(games[roomId].players, curPlayer, numPlayers, 1);
-            games[roomId].state.totalDices--;
             games[roomId].state.lastBid = undefined;
             games[roomId].state.newDices = true;
             break;
         case ROUND_STATE.PLAYER_BEFORE_LOSE:
             const playerBefore = nextPlayer(games[roomId].players, curPlayer-1, numPlayers, -1);
-            games[roomId].players[playerBefore].numDices--;
-            games[roomId].state.totalDices--;
+            playerRemoveDice(roomId, playerBefore);
             games[roomId].state.lastBid = undefined;
             games[roomId].state.newDices = true;
             if (!isPlayerGameOver(games[roomId].players, playerBefore))
