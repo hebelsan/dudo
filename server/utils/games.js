@@ -50,9 +50,13 @@ module.exports.initGame = (roomId) => {
 module.exports.updateGame = (playerId, state) => {
     const roomId = user2Room[playerId];
     console.log(`updateGame room: ${roomId}`);
+    if (!roomId) {
+        console.error(`can't find roomId to player: ${playerId}`)
+    }
+    const game = games[roomId];
     if (state.hasOwnProperty('bid')) {
-        const roundState = getRoundState(roomId, state.bid);
-        applyRoundState(roomId, roundState, state.bid);
+        const roundState = getRoundState(game, state.bid);
+        applyRoundState(game, roundState, state.bid);
     }
     return roomId;
 };
@@ -118,13 +122,13 @@ const isPlayerGameOver = (players, arrIdx) => {
     return (players[arrIdx].numDices) === 0;
 }
 
-const playerRemoveDice = (roomId, idx) => {
-    games[roomId].players[idx].numDices--;
-    games[roomId].state.totalDices--;
-    if (games[roomId].players[idx].numDices == 0) {
-        const playersAlive = games[roomId].players.filter((player) => player.numDices !== 0);
+const playerRemoveDice = (game, idx) => {
+    game.players[idx].numDices--;
+    game.state.totalDices--;
+    if (game.players[idx].numDices == 0) {
+        const playersAlive = game.players.filter((player) => player.numDices !== 0);
         if (playersAlive.length === 1) {
-            games[roomId].state.won = playersAlive[0].name;
+            game.state.won = playersAlive[0].name;
         }
     }
 }
@@ -147,16 +151,16 @@ const ROUND_STATE = {
     WIN_GAIN: "win_gain" // (it's your turn and you win a dice)
 }
 // returns ROUND_STATE
-const getRoundState = (roomId, newBid) => {
+const getRoundState = (game, newBid) => {
     if ( typeof newBid === 'object' && newBid !== null)
         return ROUND_STATE.NEXT;
-    console.log(games[roomId].state);
-    const lastBid = games[roomId].state.lastBid;
-    const allDices = games[roomId].players.map((player) => player.dices).flat();
+    console.log(game.state);
+    const lastBid = game.state.lastBid;
+    const allDices = game.players.map((player) => player.dices).flat();
     const numBidDices = allDices.filter(dice => lastBid.dice === dice || dice === 1).length;
     if (newBid === true) {
-        const curTotalDices = games[roomId].state.totalDices;
-        const maxDices = games[roomId].players.length * PLAYERS_DICES;
+        const curTotalDices = game.state.totalDices;
+        const maxDices = game.players.length * PLAYERS_DICES;
         if (numBidDices === lastBid.times && curTotalDices >= maxDices/2 && curTotalDices !== maxDices)
             return ROUND_STATE.WIN_GAIN;
         if (numBidDices === lastBid.times)
@@ -171,37 +175,37 @@ const getRoundState = (roomId, newBid) => {
     } else
         console.error("something is wrong with the bid...");
 }
-const applyRoundState = (roomId, roundState, newBid) => {
-    const curPlayer = games[roomId].state.curPlayer;
-    const numPlayers = games[roomId].players.length;
+const applyRoundState = (game, roundState, newBid) => {
+    const curPlayer = game.state.curPlayer;
+    const numPlayers = game.players.length;
     switch(roundState) {
         case ROUND_STATE.NEXT:
-            games[roomId].state.lastBid = newBid;
-            games[roomId].state.curPlayer = nextPlayer(games[roomId].players, curPlayer+1, numPlayers, 1);
+            game.state.lastBid = newBid;
+            game.state.curPlayer = nextPlayer(game.players, curPlayer+1, numPlayers, 1);
             break;
         case ROUND_STATE.CUR_PLAYER_LOSE:
-            playerRemoveDice(roomId, games[roomId].state.curPlayer);
-            games[roomId].state.curPlayer = nextPlayer(games[roomId].players, curPlayer, numPlayers, 1);
-            games[roomId].state.lastBid = undefined;
-            games[roomId].state.newDices = true;
+            playerRemoveDice(game, curPlayer);
+            game.state.curPlayer = nextPlayer(game.players, curPlayer, numPlayers, 1);
+            game.state.lastBid = undefined;
+            game.state.newDices = true;
             break;
         case ROUND_STATE.PLAYER_BEFORE_LOSE:
-            const playerBefore = nextPlayer(games[roomId].players, curPlayer-1, numPlayers, -1);
-            playerRemoveDice(roomId, playerBefore);
-            games[roomId].state.lastBid = undefined;
-            games[roomId].state.newDices = true;
-            if (!isPlayerGameOver(games[roomId].players, playerBefore))
-                games[roomId].state.curPlayer = playerBefore;
+            const playerBefore = nextPlayer(game.players, curPlayer-1, numPlayers, -1);
+            playerRemoveDice(game, playerBefore);
+            game.state.lastBid = undefined;
+            game.state.newDices = true;
+            if (!isPlayerGameOver(game.players, playerBefore))
+            game.state.curPlayer = playerBefore;
             break;
         case ROUND_STATE.WIN:
-            games[roomId].state.lastBid = undefined;
-            games[roomId].state.newDices = true;
+            game.state.lastBid = undefined;
+            game.state.newDices = true;
             break;
         case ROUND_STATE.WIN_GAIN:
-            games[roomId].players[games[roomId].state.curPlayer].numDices++;
-            games[roomId].state.lastBid = undefined;
-            games[roomId].state.newDices = true;
-            games[roomId].state.totalDices++;
+            game.players[game.state.curPlayer].numDices++;
+            game.state.lastBid = undefined;
+            game.state.newDices = true;
+            game.state.totalDices++;
             break;
     }
 }
