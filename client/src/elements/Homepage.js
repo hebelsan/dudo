@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
 import DicesSvg from '../assets/logo.svg';
-import { nanoid } from 'nanoid'
+import { nanoid } from 'nanoid';
+import { InfoButton } from '../utils/infoBtn'
 
 const Homepage = ({socket}) => {
     const [roomCode, setRoomCode] = useState('');
@@ -9,14 +10,14 @@ const Homepage = ({socket}) => {
 
     return (
         <div className='Homepage'>
+            <h1>Dudo</h1>
             <div className='homepage-menu'>
-            <img src={DicesSvg} width='200' alt={'dices'}/> 
-                {/* <DicesSvg /> */}
+                <img src={DicesSvg} width='200' style={{paddingTop: '5px'}} alt={'dices'}/> 
                 <div className='homepage-form'>
                     <input type='text' placeholder='Player Name' onChange={(event) => setPlayerName(event.target.value)} />
                     <div className='homepage-create'>
                         <Link to={`/lobby?roomCode=${nanoid(10)}`} state={{playerName: playerName}}>
-                            <button className="game-button green">CREATE GAME</button>
+                            <button className="game-button green">CREATE NEW GAME</button>
                         </Link>
                     </div>
                     <div className='homepage-join'>
@@ -27,6 +28,7 @@ const Homepage = ({socket}) => {
                     </div>
                 </div>
             </div>
+            <InfoButton/>
         </div>
     )
 }
