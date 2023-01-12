@@ -8,7 +8,6 @@ games [
             curPlayer: int (index)
             lastBid: bid
             totalDices: int
-            newDices: bool
             won: undefined | string
         sendState
             turn: bool (is it your turn)
@@ -39,10 +38,10 @@ module.exports.initGame = (roomId) => {
     const game = games[roomId];
     // TODO randomize first player and players position
     game.state.curPlayer = 0;
-    game.state.newDices = true;
     game.state.lastBid = undefined;
     game.state.won = undefined;
     game.state.totalDices = game.players.length * PLAYERS_DICES;
+    newDices(game);
 };
 
 /*
@@ -69,8 +68,6 @@ module.exports.sendGameState = (roomId, io, event='newGameState') => {
         console.error(`can't find game to roomId: ${roomId}`);
         return;
     }
-    if (game.state.newDices)
-        newDices(game);
     game.players.forEach((player, index) => {
         let sendState = {
             dices: player.dices,
@@ -147,7 +144,6 @@ const newDices = (game) => {
     game.players.forEach((player) => { 
         player.dices = Array.from({length: player.numDices}, () => Math.trunc(Math.random()*6) + 1)
     });
-    game.state.newDices = false;
 }
 
 const ROUND_STATE = {
@@ -194,24 +190,24 @@ const applyRoundState = (game, roundState, newBid) => {
             playerRemoveDice(game, curPlayer);
             game.state.curPlayer = nextPlayer(game.players, curPlayer, numPlayers, 1);
             game.state.lastBid = undefined;
-            game.state.newDices = true;
+            newDices(game);
             break;
         case ROUND_STATE.PLAYER_BEFORE_LOSE:
             const playerBefore = nextPlayer(game.players, curPlayer-1, numPlayers, -1);
             playerRemoveDice(game, playerBefore);
             game.state.lastBid = undefined;
-            game.state.newDices = true;
+            newDices(game);
             if (!isPlayerGameOver(game.players, playerBefore))
             game.state.curPlayer = playerBefore;
             break;
         case ROUND_STATE.WIN:
             game.state.lastBid = undefined;
-            game.state.newDices = true;
+            newDices(game);
             break;
         case ROUND_STATE.WIN_GAIN:
             game.players[game.state.curPlayer].numDices++;
             game.state.lastBid = undefined;
-            game.state.newDices = true;
+            newDices(game);
             game.state.totalDices++;
             break;
     }
