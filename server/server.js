@@ -1,16 +1,23 @@
-const path = require('path');
-const express = require('express');
+import path from 'path';
+import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
+import { GameState } from './lib/GameState.js';
+
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
-const http = require('http');
 const server = http.createServer(app);
-const { Server } = require("socket.io");
 const io = new Server(server);
-const { gameExists, createGame, playerJoin, playerRemove, players, playerIsInGame, initGame, sendGameState, updateGame } = require('./utils/games')
 
 // const cors = require('cors');
 // app.use(cors());
 
+const GAMES = {};
 const PORT = process.env.PORT || 5000
+
 
 app.use(express.static(path.resolve(__dirname, '..', 'client', 'build')))
 app.get('*', (req, res) => {
@@ -23,32 +30,42 @@ io.on('connection', (socket) => {
     // LOBBY
     socket.on('join', (payload, setNameState) => {
         const playerRoom = payload.room;
-        if (! gameExists(playerRoom)) createGame(playerRoom);
-        const numPlayers = players(playerRoom).length + 1;
-        const playerName = payload.name === '' ? `Player${numPlayers}` : payload.name;
+        let game;
+        if (! GAMES[playerRoom]) {
+            game = new GameState(playerRoom);
+            GAMES[playerRoom] = game;
+        } else {
+            game = GAMES[playerRoom];
+        }
+        const playerNumber = game.numPlayers() + 1;
+        const playerName = payload.name === '' ? `Player${playerNumber}` : payload.name;
         setNameState(playerName);
-        playerJoin(playerRoom, socket.id, playerName)
+        game.playerJoin(socket.id, playerName)
         socket.join(playerRoom);
-        io.to(playerRoom).emit('lobbyData', { users: players(playerRoom) })
+        io.to(playerRoom).emit('lobbyData', { users: game.getPlayersJSON() })
     })
-    socket.on('startGame', (room) => {
-        initGame(room);
-        sendGameState(room, io, 'lobbyFollowGame');
+    socket.on('startGame', (roomID) => {
+        const game = GAMES[roomID];
+        game.sendGameState(io, 'lobbyFollowGame');
     })
 
     // GAME
-    socket.on('updateGame', (state) => {
-        const room = updateGame(socket.id, state);
-        sendGameState(room, io);
+    socket.on('updateGame', (data) => {
+        const roomID = data.roomID;
+        const game = GAMES[roomID];
+        game.updateGame(data);
+        game.sendGameState(io);
     })
 
     // GENERAL
-    socket.on('disconnect', () => {
-        if (playerIsInGame(socket.id)) {
-            const {roomId ,rmPlayer} = playerRemove(socket.id);
-            io.to(roomId).emit('lobbyData', { user: rmPlayer, users: players(roomId) })
+    socket.on('disconnecting', () => {
+        for (const room of socket.rooms) {
+            if (GAMES[room] && GAMES[room].playerIsInGame(socket.id)) {
+                const rmPlayer = GAMES[room].playerRemove(socket.id);
+                io.to(room).emit('lobbyData', { user: rmPlayer, users: GAMES[room].numPlayers() })
+            }
         }
-        console.log(`user:${socket.id} diconnected`);
+        console.log(`user:${socket.id} diconnecting`);
     });
 });
 

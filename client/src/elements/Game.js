@@ -19,9 +19,10 @@ GameState:
 const Game = ({socket}) => {
     const location = useLocation();
     const [gameState, setGameState] = useState(location.state.gameState);
+    const playerName = location.state.player;
+    const roomCode = location.state.roomCode;
     const [inputMulitplier, setInputMulitplier] = useState(1);
     const [inputDice, setInputDice] = useState(1);
-    const playerName = location.state.player;
     
     useEffect(() => {
         socket.on('newGameState', (newGameState) => {
@@ -33,7 +34,7 @@ const Game = ({socket}) => {
     }, [])
 
     const handleBidDecision = (decision) => {
-        socket.emit('updateGame', {bid: decision});
+        socket.emit('updateGame', {roomID: roomCode, bid: decision});
     };
 
     const isValidBid = () => {

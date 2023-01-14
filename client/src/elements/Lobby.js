@@ -30,7 +30,7 @@ const Lobby = ({socket}) => {
     const navigate = useNavigate();
     useEffect(() => {
         socket.on('lobbyFollowGame', (gameState) => {
-            navigate(`/game?roomCode=${roomCode}`, {state:{player:playerName, gameState:gameState}});
+            navigate(`/game?roomCode=${roomCode}`, {state:{player:playerName, gameState:gameState, roomCode:roomCode}});
         })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playerName])
