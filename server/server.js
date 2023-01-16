@@ -28,7 +28,7 @@ io.on('connection', (socket) => {
     console.log(`user:${socket.id} connected`);
 
     // LOBBY
-    socket.on('join', (payload, setNameState) => {
+    socket.on('join', (payload, callback) => {
         const playerRoom = payload.room;
         let game;
         if (! GAMES[playerRoom]) {
@@ -39,10 +39,10 @@ io.on('connection', (socket) => {
         }
         const playerNumber = game.numPlayers() + 1;
         const playerName = payload.name === '' ? `Player${playerNumber}` : payload.name;
-        setNameState(playerName);
-        game.playerJoin(socket.id, playerName)
+        game.playerJoin(socket.id, playerName);
         socket.join(playerRoom);
-        io.to(playerRoom).emit('lobbyData', { users: game.getPlayersJSON() })
+        callback(playerName, socket.id);
+        io.to(playerRoom).emit('lobbyData', { players: game.getPlayersJSON() })
     })
     socket.on('startGame', (roomID) => {
         const game = GAMES[roomID];

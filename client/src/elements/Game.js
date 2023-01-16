@@ -19,8 +19,10 @@ GameState:
 const Game = ({socket}) => {
     const location = useLocation();
     const [gameState, setGameState] = useState(location.state.gameState);
-    const playerName = location.state.player;
+    const playerName = location.state.playerName;
+    const playerID = location.state.playerID;
     const roomCode = location.state.roomCode;
+    const players = location.state.players;
     const [inputMulitplier, setInputMulitplier] = useState(1);
     const [inputDice, setInputDice] = useState(1);
     
@@ -46,10 +48,22 @@ const Game = ({socket}) => {
         );
     }
 
+    const isPlayersTurn = () => {
+        return gameState.curPlayer === playerID;
+    }
+
+    const playerHasWon = () => {
+        return gameState.won === playerID;
+    }
+
+    const playerHasLost = () => {
+        return gameState.dices.length === 0;
+    }
+
     const renderActionBar = () => {
-        if (gameState.dices.length === 0) {
+        if (playerHasLost()) {
             return <b>you lose!</b>
-        } else if (gameState.won === playerName) {
+        } else if (playerHasWon()) {
             return  <b>you win!</b>
         } else {
             return (
@@ -59,11 +73,12 @@ const Game = ({socket}) => {
                     <div>Current Player: {gameState.curPlayer}</div>
                     <div>your turn: {String(gameState.turn)}</div>
                     <div>last bid: {JSON.stringify(gameState.lastBid)}</div>
+                    <div>{players.map((p) => p.name)}</div>
 
                     <div>your dices: {gameState.dices}</div>
                     <div>{gameState.dices.map((dice, idx) => <img key={'dice' + idx} src={getDiceImg(dice)} width='50' alt={'dice' + idx}/>) }</div>
         
-                    <div className='playerInput' style={{visibility: gameState.turn && !(gameState.won === playerName) ? 'visible' : 'hidden' }}>
+                    <div className='playerInput' style={{visibility: isPlayersTurn() && !playerHasWon() ? 'visible' : 'hidden' }}>
                         <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(true)}>
                             True
                         </button>

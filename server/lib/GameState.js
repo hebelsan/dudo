@@ -29,9 +29,9 @@ export class GameState {
                 dices: player.dices,
                 turn: index == this.#curPlayer,
                 totalDices: this.#totalDices,
-                curPlayer: this.#players[this.#curPlayer].getName(),
+                curPlayer: this.#players[this.#curPlayer].getID(),
                 lastBid: this.#lastBid,
-                won: this.#playerWon?.getName()
+                won: this.#playerWon?.getID()
             }
             io.to(player.getID()).emit(event, sendState);
         });
