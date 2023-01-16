@@ -40,7 +40,6 @@ export class GameState {
     playerJoin(playerID, playerName) {
         this.#players.push(new Player(playerID, playerName, this.#maxPlayerDices))
         this.#totalDices = this.#players.length * this.#maxPlayerDices;
-        this.#newDices();
     }
 
     playerIsInGame(playerID) {
@@ -65,7 +64,7 @@ export class GameState {
         return this.#players.map((player) => player.serialize())
     }
 
-    #newDices() {
+    newDices() {
         this.#players.forEach((player) => { 
             player.newDices();
         });
@@ -134,24 +133,24 @@ export class GameState {
                 this.#playerRemoveDice(curPlayer);
                 this.#curPlayer = this.#nextPlayer(this.#players, curPlayer, numPlayers, 1);
                 this.#lastBid = undefined;
-                this.#newDices();
+                this.newDices();
                 break;
             case ROUND_STATE.PLAYER_BEFORE_LOSE:
                 const playerBefore = this.#nextPlayer(this.#players, curPlayer-1, numPlayers, -1);
                 this.#playerRemoveDice(playerBefore);
                 this.#lastBid = undefined;
-                this.#newDices();
+                this.newDices();
                 if (!this.#isPlayerGameOver(playerBefore))
                     this.#curPlayer = playerBefore;
                 break;
             case ROUND_STATE.WIN:
                 this.#lastBid = undefined;
-                this.#newDices();
+                this.newDices();
                 break;
             case ROUND_STATE.WIN_GAIN:
                 this.#players[this.#curPlayer].numDices++;
                 this.#lastBid = undefined;
-                this.#newDices();
+                this.newDices();
                 this.#totalDices++;
                 break;
         }

@@ -46,6 +46,7 @@ io.on('connection', (socket) => {
     })
     socket.on('startGame', (roomID) => {
         const game = GAMES[roomID];
+        game.newDices();
         game.sendGameState(io, 'lobbyFollowGame');
     })
 
