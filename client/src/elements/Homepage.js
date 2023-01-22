@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 import DicesSvg from '../assets/logo.svg';
 import { nanoid } from 'nanoid';
-import { InfoButton } from '../utils/infoBtn'
+import { InfoButton } from '../components/infoBtn'
 
 const Homepage = ({socket}) => {
     const [roomCode, setRoomCode] = useState('');

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import * as bid from '../utils/bid';
-import { getDiceImg } from '../utils/images';
+import { getDiceImg } from '../components/diceImg';
+import { GameStatus } from '../components/Table';
 
 /**
 GameState:
@@ -70,12 +71,7 @@ const Game = ({socket}) => {
                 <div className="GameInfo">
                     <div>Your Name: {playerName}</div>
                     <div>Total number of dices: {gameState.totalDices}</div>
-                    <div>Current Player: {gameState.curPlayer}</div>
-                    <div>your turn: {String(gameState.turn)}</div>
                     <div>last bid: {JSON.stringify(gameState.lastBid)}</div>
-                    <div>{players.map((p) => p.name)}</div>
-
-                    <div>your dices: {gameState.dices}</div>
                     <div>{gameState.dices.map((dice, idx) => <img key={'dice' + idx} src={getDiceImg(dice)} width='50' alt={'dice' + idx}/>) }</div>
         
                     <div className='playerInput' style={{visibility: isPlayersTurn() && !playerHasWon() ? 'visible' : 'hidden' }}>
@@ -98,6 +94,8 @@ const Game = ({socket}) => {
                             Bid
                         </button>
                     </div>
+
+                    <GameStatus players={players} state={gameState} />
                 </div>
             )
         }
