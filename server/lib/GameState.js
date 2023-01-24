@@ -9,6 +9,7 @@ export class GameState {
     #curPlayer = 0;
     #lastBid = undefined;
     #playerWon = undefined;
+    #diceChange = undefined; // {playerID: '123', amount: -1}
 
     constructor(roomID, maxPlayerDices=5) {
         this.#roomID = roomID;
@@ -31,10 +32,12 @@ export class GameState {
                 totalDices: this.#totalDices,
                 curPlayer: this.#players[this.#curPlayer].getID(),
                 lastBid: this.#lastBid,
-                won: this.#playerWon?.getID()
+                diceChange: this.#diceChange,
+                playerWon: this.#playerWon?.getID(),
             }
             io.to(player.getID()).emit(event, sendState);
         });
+        this.#diceChange = undefined;
     };
     
     playerJoin(playerID, playerName) {
@@ -89,6 +92,7 @@ export class GameState {
     #playerRemoveDice(idx) {
         this.#players[idx].numDices--;
         this.#totalDices--;
+        this.#setDiceChange(this.#players[idx].getID(), -1);
         if (this.#players[idx].numDices == 0) {
             const playersAlive = this.#players.filter((player) => player.numDices !== 0);
             if (playersAlive.length === 1) {
@@ -145,14 +149,20 @@ export class GameState {
                 break;
             case ROUND_STATE.WIN:
                 this.#lastBid = undefined;
+                this.#setDiceChange(this.#players[this.#curPlayer].getID(), 0);
                 this.newDices();
                 break;
             case ROUND_STATE.WIN_GAIN:
                 this.#players[this.#curPlayer].numDices++;
+                this.#setDiceChange(this.#players[this.#curPlayer].getID(), 1)
                 this.#lastBid = undefined;
                 this.newDices();
                 this.#totalDices++;
                 break;
         }
+    }
+
+    #setDiceChange(id, amount) {
+        this.#diceChange = { playerID: id, amount: amount }
     }
 };

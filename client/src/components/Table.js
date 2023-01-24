@@ -1,12 +1,15 @@
 import React from 'react';
-
+import './Table.css';
 import Clockwise_arrow from '../assets/clockwise_arrow.svg';
+import Skull_lose_dice from '../assets/skulls/skull_lose.svg';
+import Skull_win_dice from '../assets/skulls/skull_win.svg';
 
 export class GameStatus extends React.Component {
   render() {
     const r = 220;
     const circleWidthFactor = 3;
     const clockwiseImgWidth = 50;
+    const skullAnimationWidth = 50;
     const playerInfoBoxWidth = 150;
     const playerInfoBoxHeight = 30;
     const ZERO_TRASHOLD = 0.001;
@@ -37,41 +40,68 @@ export class GameStatus extends React.Component {
       return angles;
     }
 
-    const playerStyle = (angle, id) => {
-      const style = {
+    const renderPlayer = (id, name, angle) => {
+      const infoBoxStyle = {
         width: playerInfoBoxWidth,
         height: playerInfoBoxHeight,
         position: 'absolute', 
         border: '1px solid black',
       }
 
-      if (id === this.props.state.curPlayer) {
-        style['background-color'] = '#D0D0D0';
+      const skullStyle = {
+        width: skullAnimationWidth,
+        height: skullAnimationWidth,
+        position: 'absolute', 
       }
 
       // x value
       const circleX = getCircleX(angle, r)
       if (circleX > ZERO_TRASHOLD) {
-        style.right = circleWidthFactor*r - circleX;
+        infoBoxStyle.right = circleWidthFactor*r - circleX;
+        skullStyle.right = circleWidthFactor*r - circleX;
       } else if (circleX < -ZERO_TRASHOLD) {
-        style.left = circleWidthFactor*r + circleX;
+        infoBoxStyle.left = circleWidthFactor*r + circleX;
+        skullStyle.left = circleWidthFactor*r - circleX;
       } else {
-        style.left = circleWidthFactor*r + circleX - playerInfoBoxWidth/2;
+        infoBoxStyle.left = circleWidthFactor*r + circleX - playerInfoBoxWidth/2;
+        skullStyle.left = circleWidthFactor*r + circleX - skullAnimationWidth/2;
       }
 
       // y value
       const circleY = getCircleY(angle, r);
       if (circleY > ZERO_TRASHOLD) {
-        style.bottom = r - circleY;
+        infoBoxStyle.bottom = r - circleY;
+        skullStyle.bottom = r - circleY;
       } else if (circleY < -ZERO_TRASHOLD) {
-        style.top = r + circleY;
+        infoBoxStyle.top = r + circleY;
+        skullStyle.top = r + circleY;
       } else {
-        style.top = r + circleY - playerInfoBoxHeight
+        infoBoxStyle.top = r + circleY - playerInfoBoxHeight
+        skullStyle.top = r + circleY - skullAnimationWidth;
+      }
+
+      let skullImg = <></>;
+
+      if (id === this.props.state.curPlayer) {
+        infoBoxStyle['backgroundColor'] = '#D0D0D0';
+      }
+
+      if (id === this.props.state?.diceChange?.playerID) {
+        if (this.props.state?.diceChange.amount === 1) {
+          skullImg = <img src={Skull_win_dice} alt={id + 'skull'} style={skullStyle} className='fade-out'/>;
+        }
+        if (this.props.state?.diceChange.amount === -1) {
+          skullImg = <img src={Skull_lose_dice} alt={id + 'skull'} style={skullStyle} className='fade-out'/>;
+        }
       }
       
-      return style;
+      return (<>
+        <div key={'player_angle' + angle} style={infoBoxStyle}>
+          {name}
+        </div>
+        {skullImg}
+      </>);
     }
-
     
     return (
       <div style={{
@@ -84,14 +114,7 @@ export class GameStatus extends React.Component {
         'marginTop': '10px',
         'marginBottom': '10px'}}>
 
-        {playersPosition().map((p) => {
-          return <div 
-            key={'player_angle' + p.angle}
-            style={playerStyle(p.angle, p.id)}
-          >
-            {p.name}
-          </div>
-        })}
+        { playersPosition().map(p => renderPlayer(p.id, p.name, p.angle)) }
 
         <img 
           src={Clockwise_arrow} 

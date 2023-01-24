@@ -54,7 +54,7 @@ const Game = ({socket}) => {
     }
 
     const playerHasWon = () => {
-        return gameState.won === playerID;
+        return gameState.playerWon === playerID;
     }
 
     const playerHasLost = () => {
