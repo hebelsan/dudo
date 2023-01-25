@@ -27,6 +27,7 @@ export class GameState {
     sendGameState(io, event='newGameState') {
         this.#players.forEach((player, index) => {
             let sendState = {
+                id: player.getID(),
                 dices: player.dices,
                 turn: index == this.#curPlayer,
                 totalDices: this.#totalDices,
