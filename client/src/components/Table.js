@@ -11,7 +11,7 @@ export class GameStatus extends React.Component {
     const clockwiseImgWidth = 50;
     const skullWidth = 50;
     const playerInfoBoxWidth = 150;
-    const playerInfoBoxHeight = 35;
+    const playerInfoBoxHeight = 34;
     const playerBorderWidth = '2px';
     const ZERO_TRASHOLD = 0.001;
 
@@ -45,7 +45,8 @@ export class GameStatus extends React.Component {
       const infoBoxStyle = {
         width: playerInfoBoxWidth,
         height: playerInfoBoxHeight,
-        position: 'absolute', 
+        position: 'absolute',
+        border: `${playerBorderWidth} solid transparent`
       }
 
       const skullStyle = {
@@ -83,9 +84,10 @@ export class GameStatus extends React.Component {
       let skullImg = <></>;
 
       if (id === this.props.state.curPlayer) {
-          infoBoxStyle.className = 'moving-border';
+        infoBoxStyle.borderColor = 'transparent';
+        infoBoxStyle.className = 'moving-border';
       } else {
-        infoBoxStyle.border = `${playerBorderWidth} solid black`;
+        infoBoxStyle.borderColor = 'black';
       }
 
       if (id === this.props.state.id) {

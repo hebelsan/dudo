@@ -48,29 +48,28 @@
   &::before {
       content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
       border: 2px solid black;
       transition: all .3s;
-      animation: clippath 4s infinite linear;
+      animation: clippath 5s infinite linear;
   }
 }
 
 @keyframes clippath {
     0%,
     100% {
-        clip-path: inset(0 0 95% 0);
+        clip-path: inset(0 0 97% 0);
     }
-    
     25% {
-        clip-path: inset(0 95% 0 0);
+        clip-path: inset(0 97% 0 0);
     }
     50% {
-        clip-path: inset(95% 0 0 0);
+        clip-path: inset(97% 0 0 0);
     }
     75% {
-        clip-path: inset(0 0 0 95%);
+        clip-path: inset(0 0 0 97%);
     }
 }
