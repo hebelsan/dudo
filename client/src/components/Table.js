@@ -12,7 +12,7 @@ export class GameStatus extends React.Component {
     const skullWidth = 50;
     const playerInfoBoxWidth = 150;
     const playerInfoBoxHeight = 34;
-    const playerBorderWidth = '2px';
+    const playerBorderWidth = '3px';
     const ZERO_TRASHOLD = 0.001;
 
     const numPlayers = this.props.players.length;
