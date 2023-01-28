@@ -5,23 +5,22 @@ import Skull_lose_dice from '../assets/skulls/skull_lose.svg';
 import Skull_win_dice from '../assets/skulls/skull_win.svg';
 
 export function Table(props) {
-  const { height, width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
 
   let circleWidthFactor = 1;
   let circleHeightFactor = 1;
   const playerBorderWidth = '3px';
   const ZERO_TRASHOLD = 0.001;
 
-  // console.log(height);
-  // console.log(props.dimensions.h);
-
-  const calcR = (circleOvalFactor = 3) => {
+  const calcR = () => {
+    const circleWidth = width / 100 * 95;
+    const circleHeight = (height * props.heightAmount) / 100 * 95;
     if (width >= height) {
-      circleWidthFactor = circleOvalFactor;
-      return (width / 100 * 95) / circleOvalFactor / 2;
+      circleWidthFactor = circleWidth/circleHeight;
+      return circleHeight / 2;
     } else {
-      circleHeightFactor = circleOvalFactor;
-      return (height / 100 * 95) / circleOvalFactor / 2;
+      circleHeightFactor = circleHeight/circleWidth;
+      return circleWidth / 2;
     }
   }
 
@@ -153,9 +152,12 @@ export function Table(props) {
       />
       <div 
         style={{
+          position: 'absolute', 
           width: totalDicesWidth,
           height: totalDicesWidth,
-          position: 'absolute', 
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           left: circleWidthFactor*r - totalDicesWidth/2, 
           top: circleHeightFactor*r - totalDicesWidth/2,
         }}>

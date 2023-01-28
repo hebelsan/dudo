@@ -26,6 +26,8 @@ const Game = ({socket}) => {
     const players = location.state.players;
     const [inputMulitplier, setInputMulitplier] = useState(1);
     const [inputDice, setInputDice] = useState(1);
+
+    const inputHeightAmount = 0.25;
     
     useEffect(() => {
         socket.on('newGameState', (newGameState) => {
@@ -69,31 +71,33 @@ const Game = ({socket}) => {
         } else {
             return (
                 <View className="GameInfo" style={{width: '100%', height:'100%', position:'absolute', flex: 1}}>
-                    <div>last bid: {JSON.stringify(gameState.lastBid)}</div>
-                    <div>{gameState.dices.map((dice, idx) => <img key={'dice' + idx} src={getDiceImg(dice)} width='50' alt={'dice' + idx}/>) }</div>
-        
-                    <div className='playerInput' style={{visibility: isPlayersTurn() && !playerHasWon() ? 'visible' : 'hidden' }}>
-                        <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(true)}>
-                            True
-                        </button>
-                        <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(false)}>
-                            False
-                        </button>
-                        <input type="number" id="multiplier" name="multiplier" min="1" max={gameState.totalDices} value={inputMulitplier} onChange={e => setInputMulitplier(parseInt(e.target.value))} />
-                        <select name="diceValue" id="diceValue" onChange={e => setInputDice(parseInt(e.target.value))} value={inputDice}>
-                            <option value="1">ones</option>
-                            <option value="2">twos</option>
-                            <option value="3">threes</option>
-                            <option value="4">fours</option>
-                            <option value="5">fives</option>
-                            <option value="6">sixs</option>
-                        </select>
-                        <button type="button" disabled={!isValidBid()} onClick={() => handleBidDecision({times: inputMulitplier, dice: inputDice})}>
-                            Bid
-                        </button>
-                    </div>
+                    <View style={{width: '100%', height: inputHeightAmount * 100 + '%'}}>
+                        <div>last bid: {JSON.stringify(gameState.lastBid)}</div>
+                        <div>{gameState.dices.map((dice, idx) => <img key={'dice' + idx} src={getDiceImg(dice)} width='50' alt={'dice' + idx}/>) }</div>
+            
+                        <div className='playerInput' style={{visibility: isPlayersTurn() && !playerHasWon() ? 'visible' : 'hidden' }}>
+                            <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(true)}>
+                                True
+                            </button>
+                            <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(false)}>
+                                False
+                            </button>
+                            <input type="number" id="multiplier" name="multiplier" min="1" max={gameState.totalDices} value={inputMulitplier} onChange={e => setInputMulitplier(parseInt(e.target.value))} />
+                            <select name="diceValue" id="diceValue" onChange={e => setInputDice(parseInt(e.target.value))} value={inputDice}>
+                                <option value="1">ones</option>
+                                <option value="2">twos</option>
+                                <option value="3">threes</option>
+                                <option value="4">fours</option>
+                                <option value="5">fives</option>
+                                <option value="6">sixs</option>
+                            </select>
+                            <button type="button" disabled={!isValidBid()} onClick={() => handleBidDecision({times: inputMulitplier, dice: inputDice})}>
+                                Bid
+                            </button>
+                        </div>
+                    </View>
                     <View style={{flex: 1}}>
-                        <Table players={players} state={gameState} />
+                        <Table players={players} state={gameState} heightAmount={1-inputHeightAmount} />
                     </View>
                 </View>
             )
