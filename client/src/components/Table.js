@@ -7,11 +7,25 @@ import Skull_win_dice from '../assets/skulls/skull_win.svg';
 export function Table(props) {
   const { height, width } = useWindowDimensions();
 
-  const circleWidthFactor = 3;
+  let circleWidthFactor = 1;
+  let circleHeightFactor = 1;
   const playerBorderWidth = '3px';
   const ZERO_TRASHOLD = 0.001;
 
-  const r = (width / 100 * 95) / circleWidthFactor / 2;
+  // console.log(height);
+  // console.log(props.dimensions.h);
+
+  const calcR = (circleOvalFactor = 3) => {
+    if (width >= height) {
+      circleWidthFactor = circleOvalFactor;
+      return (width / 100 * 95) / circleOvalFactor / 2;
+    } else {
+      circleHeightFactor = circleOvalFactor;
+      return (height / 100 * 95) / circleOvalFactor / 2;
+    }
+  }
+
+  const r = calcR();
   const clockwiseImgWidth = 50;
   const skullWidth = 50;
   const totalDicesWidth = 30;
@@ -26,12 +40,12 @@ export function Table(props) {
 
   // x = r * cos(PHI)
   const getCircleX = (degree, radius) => {
-    return circleWidthFactor* Math.cos(toRadian(degree)) * radius;
+    return circleWidthFactor * Math.cos(toRadian(degree)) * radius;
   }
 
   // y = r * sin(PHI)
   const getCircleY = (degree, radius) => {
-    return Math.sin(toRadian(degree)) * radius;
+    return circleHeightFactor * Math.sin(toRadian(degree)) * radius;
   }
 
   const playersPosition = (startAngle = 90) => {
@@ -74,14 +88,14 @@ export function Table(props) {
     // y value
     const circleY = getCircleY(angle, r);
     if (circleY > ZERO_TRASHOLD) {
-      infoBoxStyle.bottom = r - circleY;
-      skullStyle.bottom = r - circleY;
+      infoBoxStyle.bottom = circleHeightFactor * r - circleY;
+      skullStyle.bottom = circleHeightFactor * r - circleY;
     } else if (circleY < -ZERO_TRASHOLD) {
-      infoBoxStyle.top = r + circleY;
-      skullStyle.top = r + circleY;
+      infoBoxStyle.top = circleHeightFactor * r + circleY;
+      skullStyle.top = circleHeightFactor * r + circleY;
     } else {
-      infoBoxStyle.top = r + circleY - playerInfoBoxHeight
-      skullStyle.top = r + circleY - skullWidth;
+      infoBoxStyle.top = circleHeightFactor * r + circleY - playerInfoBoxHeight
+      skullStyle.top = circleHeightFactor * r + circleY - skullWidth;
     }
 
     let skullImg = <></>;
@@ -98,34 +112,30 @@ export function Table(props) {
       // infoBoxStyle.fontStyle = 'italic';
     }
 
-    console.log(props.state?.diceChange);
     if (id === props.state?.diceChange?.playerID) {
       if (props.state?.diceChange.amount === 1) {
-        skullImg = <img src={Skull_win_dice} alt={id + 'skull'} style={skullStyle} className='fade-out'/>;
+        skullImg = <img key={'skull_win_' + angle} src={Skull_win_dice} alt={id + 'skull'} style={skullStyle} className='fade-out'/>;
       }
       if (props.state?.diceChange.amount === -1) {
-        skullImg = <img src={Skull_lose_dice} alt={id + 'skull'} style={skullStyle} className='fade-out'/>;
+        skullImg = <img key={'skull_lose_' + angle} src={Skull_lose_dice} alt={id + 'skull'} style={skullStyle} className='fade-out'/>;
       }
     }
     
-    return (<>
+    return (<div key={angle}>
       <div key={'player_angle' + angle} style={infoBoxStyle} className={infoBoxStyle.className}>
         {name}
       </div>
       {skullImg}
-    </>);
+    </div>);
   }
   
   return (
     <div style={{
       width: 2*r*circleWidthFactor, 
-      height: 2*r, 
+      height: 2*r*circleHeightFactor, 
       position: 'relative', 
       border: '1px solid black', 
-      'marginLeft': 'auto',
-      'marginRight': 'auto',
-      'marginTop': '10px',
-      'marginBottom': '10px'}}>
+      margin: 'auto'}}>
 
       { playersPosition().map(p => renderPlayer(p.id, p.name, p.angle)) }
 
@@ -137,7 +147,7 @@ export function Table(props) {
         style={{
           position: 'absolute', 
           left: circleWidthFactor*r - clockwiseImgWidth/2, 
-          top: r - clockwiseImgWidth/2,
+          top: circleHeightFactor*r - clockwiseImgWidth/2,
           transform: 'rotate(90deg)'
         }}
       />
@@ -147,7 +157,7 @@ export function Table(props) {
           height: totalDicesWidth,
           position: 'absolute', 
           left: circleWidthFactor*r - totalDicesWidth/2, 
-          top: r - totalDicesWidth/2,
+          top: circleHeightFactor*r - totalDicesWidth/2,
         }}>
       {props.state.totalDices}
       </div>

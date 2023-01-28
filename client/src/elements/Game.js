@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import {View} from 'react-native';
 import { useLocation } from 'react-router-dom';
 import * as bid from '../utils/bid';
 import { getDiceImg } from '../components/diceImg';
@@ -67,7 +68,7 @@ const Game = ({socket}) => {
             return  <b>you win!</b>
         } else {
             return (
-                <div className="GameInfo">
+                <View className="GameInfo" style={{width: '100%', height:'100%', position:'absolute', flex: 1}}>
                     <div>last bid: {JSON.stringify(gameState.lastBid)}</div>
                     <div>{gameState.dices.map((dice, idx) => <img key={'dice' + idx} src={getDiceImg(dice)} width='50' alt={'dice' + idx}/>) }</div>
         
@@ -91,9 +92,10 @@ const Game = ({socket}) => {
                             Bid
                         </button>
                     </div>
-
-                    <Table players={players} state={gameState} />
-                </div>
+                    <View style={{flex: 1}}>
+                        <Table players={players} state={gameState} />
+                    </View>
+                </View>
             )
         }
     }
