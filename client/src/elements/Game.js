@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import * as bid from '../utils/bid';
 import { getDiceImg } from '../components/diceImg';
-import { GameStatus } from '../components/Table';
+import { Table } from '../components/Table';
 
 /**
 GameState:
@@ -20,7 +20,6 @@ GameState:
 const Game = ({socket}) => {
     const location = useLocation();
     const [gameState, setGameState] = useState(location.state.gameState);
-    const playerName = location.state.playerName;
     const playerID = location.state.playerID;
     const roomCode = location.state.roomCode;
     const players = location.state.players;
@@ -69,8 +68,6 @@ const Game = ({socket}) => {
         } else {
             return (
                 <div className="GameInfo">
-                    <div>Your Name: {playerName}</div>
-                    <div>Total number of dices: {gameState.totalDices}</div>
                     <div>last bid: {JSON.stringify(gameState.lastBid)}</div>
                     <div>{gameState.dices.map((dice, idx) => <img key={'dice' + idx} src={getDiceImg(dice)} width='50' alt={'dice' + idx}/>) }</div>
         
@@ -95,7 +92,7 @@ const Game = ({socket}) => {
                         </button>
                     </div>
 
-                    <GameStatus players={players} state={gameState} />
+                    <Table players={players} state={gameState} />
                 </div>
             )
         }

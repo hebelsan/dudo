@@ -38,7 +38,7 @@ export class GameState {
             }
             io.to(player.getID()).emit(event, sendState);
         });
-        this.#diceChange = undefined;
+        this.#diceChange = {};
     };
     
     playerJoin(playerID, playerName) {
