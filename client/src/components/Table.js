@@ -61,8 +61,11 @@ export function Table(props) {
     const infoBoxStyle = {
       width: playerInfoBoxWidth,
       height: playerInfoBoxHeight,
+      border: `${playerBorderWidth} solid transparent`,
       position: 'absolute',
-      border: `${playerBorderWidth} solid transparent`
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
     }
 
     const skullStyle = {
@@ -122,7 +125,7 @@ export function Table(props) {
     
     return (<div key={angle}>
       <div key={'player_angle' + angle} style={infoBoxStyle} className={infoBoxStyle.className}>
-        {name}
+        <span class='player-text'>{name}</span>
       </div>
       {skullImg}
     </div>);

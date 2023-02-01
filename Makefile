@@ -1,5 +1,5 @@
 PORT ?= 5000
-HOST ?= 192.168.178.80
+HOST ?= 192.168.0.139
 
 debug:
 	(cd server && npm run debug)& (cd client && npm run start)

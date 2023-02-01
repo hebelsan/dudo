@@ -94,3 +94,17 @@
     border-color: white;
   }
 }
+
+
+/* 
+ * 
+ * limit player box text
+ *
+*/
+.player-text {
+  display: block;
+  width: 100px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
