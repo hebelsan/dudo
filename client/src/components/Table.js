@@ -1,17 +1,18 @@
-import useWindowDimensions from './window';
 import './Table.scss';
+import {Text} from 'react-native';
+import useWindowDimensions from './window';
 import Clockwise_arrow from '../assets/clockwise_arrow.svg';
 import Skull_lose_dice from '../assets/skulls/skull_lose.svg';
 import Skull_win_dice from '../assets/skulls/skull_win.svg';
 
 export function Table(props) {
+  const fontSize = parseInt(getComputedStyle(document.documentElement).fontSize);
+  const fontScale = 1.5;
+  const textHeight = fontSize * fontScale;
   const { width, height } = useWindowDimensions();
 
   let circleWidthFactor = 1;
   let circleHeightFactor = 1;
-  const playerBorderWidth = '3px';
-  const ZERO_TRASHOLD = 0.001;
-
   const calcR = () => {
     const circleWidth = width / 100 * 95;
     const circleHeight = (height * props.heightAmount) / 100 * 95;
@@ -24,13 +25,14 @@ export function Table(props) {
     }
   }
 
+  const ZERO_TRASHOLD = 0.001;
   const r = calcR();
-  const clockwiseImgWidth = 50;
-  const skullWidth = 50;
-  const totalDicesWidth = 30;
+  const playerBorderWidth = '3px';
+  const totalDicesWidth = 1;
+  const clockwiseImgWidth = textHeight + 20;
+  const skullWidth = clockwiseImgWidth;
+  const playerInfoBoxHeight = textHeight + 4;
   const playerInfoBoxWidth = 150;
-  const playerInfoBoxHeight = 34;
-
   const numPlayers = props.players.length;
 
   const toRadian = (degree) => {
@@ -86,7 +88,6 @@ export function Table(props) {
       infoBoxStyle.left = circleWidthFactor*r + circleX - playerInfoBoxWidth/2;
       skullStyle.left = circleWidthFactor*r + circleX - skullWidth/2;
     }
-
     // y value
     const circleY = getCircleY(angle, r);
     if (circleY > ZERO_TRASHOLD) {
@@ -111,7 +112,6 @@ export function Table(props) {
 
     if (id === props.state.id) {
       infoBoxStyle.color = '#990012';
-      // infoBoxStyle.fontStyle = 'italic';
     }
 
     if (id === props.state?.diceChange?.playerID) {
@@ -125,7 +125,7 @@ export function Table(props) {
     
     return (<div key={angle}>
       <div key={'player_angle' + angle} style={infoBoxStyle} className={infoBoxStyle.className}>
-        <span class='player-text'>{name}</span>
+        <span class='player-text table-text'>{name}</span>
       </div>
       {skullImg}
     </div>);
@@ -164,7 +164,9 @@ export function Table(props) {
           left: circleWidthFactor*r - totalDicesWidth/2, 
           top: circleHeightFactor*r - totalDicesWidth/2,
         }}>
-      {props.state.totalDices}
+        <span className='table-text'>
+          {props.state.totalDices}
+        </span>
       </div>
     </div>
   )
