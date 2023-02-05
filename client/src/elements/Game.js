@@ -25,7 +25,7 @@ const Game = ({socket}) => {
     const roomCode = location.state.roomCode;
     const players = location.state.players;
     const [inputMulitplier, setInputMulitplier] = useState(1);
-    const [inputDice, setInputDice] = useState(1);
+    const [inputDice, setInputDice] = useState(2);
 
     const inputHeightAmount = 0.25;
     
@@ -33,7 +33,7 @@ const Game = ({socket}) => {
         socket.on('newGameState', (newGameState) => {
             setGameState({...gameState, ...newGameState});
             setInputMulitplier(newGameState.lastBid?.times || 1);
-            setInputDice(newGameState.lastBid?.dice || 1);
+            setInputDice(newGameState.lastBid?.dice || 2);
         })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -46,6 +46,7 @@ const Game = ({socket}) => {
         const currBid = {times: inputMulitplier, dice: inputDice}
         const lastBid = gameState.lastBid;
         return (
+            !(!lastBid && inputDice === 1) && // not allowed to start with ones
             (inputMulitplier !== 0 && inputDice !== 0) &&
             (!lastBid || bid.isGreater(currBid, lastBid))
         );
