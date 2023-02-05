@@ -97,16 +97,30 @@
 
 
 /* 
- * 
  * limit player box text
- *
 */
 .player-text {
   display: block;
-  width: 100px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+/* 
+ * general
+*/
+
+.table {
+  position: relative;
+  border: 1px solid black; 
+  margin: auto;
+}
+
+.number-dices-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
 }
 
 .table-text {

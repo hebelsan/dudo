@@ -32,7 +32,8 @@ export function Table(props) {
   const clockwiseImgWidth = textHeight + 20;
   const skullWidth = clockwiseImgWidth;
   const playerInfoBoxHeight = textHeight + 4;
-  const playerInfoBoxWidth = 150;
+  const playerInfoBoxWidth = (width/100 * 10) > 4 * fontSize ? (width/100 * 10) : 4 * fontSize;
+  const playerInfoBoxTextWidth = playerInfoBoxWidth - 10;
   const numPlayers = props.players.length;
 
   const toRadian = (degree) => {
@@ -123,21 +124,17 @@ export function Table(props) {
       }
     }
     
-    return (<div key={angle}>
+    return (
+    <div key={angle}>
       <div key={'player_angle' + angle} style={infoBoxStyle} className={infoBoxStyle.className}>
-        <span class='player-text table-text'>{name}</span>
+        <span className='player-text table-text' style={{playerInfoBoxTextWidth}}>{name}</span>
       </div>
       {skullImg}
     </div>);
   }
   
   return (
-    <div style={{
-      width: 2*r*circleWidthFactor, 
-      height: 2*r*circleHeightFactor, 
-      position: 'relative', 
-      border: '1px solid black', 
-      margin: 'auto'}}>
+    <div style={{width: 2*r*circleWidthFactor, height: 2*r*circleHeightFactor}} className={'table'}>
 
       { playersPosition().map(p => renderPlayer(p.id, p.name, p.angle)) }
 
@@ -153,17 +150,12 @@ export function Table(props) {
           transform: 'rotate(90deg)'
         }}
       />
-      <div 
-        style={{
-          position: 'absolute', 
+      <div style={{
           width: totalDicesWidth,
           height: totalDicesWidth,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
           left: circleWidthFactor*r - totalDicesWidth/2, 
           top: circleHeightFactor*r - totalDicesWidth/2,
-        }}>
+        }} className={'number-dices-container'}>
         <span className='table-text'>
           {props.state.totalDices}
         </span>
