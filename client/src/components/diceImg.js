@@ -5,8 +5,12 @@ import dice_4_img from '../assets/dices/dice_4.svg';
 import dice_5_img from '../assets/dices/dice_5.svg';
 import dice_6_img from '../assets/dices/dice_6.svg';
 
+import dice_img_unknown from '../assets/dices/unknown.svg';
+
 export function getDiceImg(dice_value) {
     switch(dice_value) {
+        case 0:
+            return dice_img_unknown;
         case 1:
             return dice_1_img;
         case 2:
@@ -20,7 +24,7 @@ export function getDiceImg(dice_value) {
         case 6:
             return dice_6_img;
         default:
-            process.exit(`unsupported dice value: ${dice_value}`)
+            console.error(`unsupported dice value: ${dice_value}`)
     }
 }
 

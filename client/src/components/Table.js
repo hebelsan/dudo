@@ -1,11 +1,12 @@
 import './Table.scss';
-import {Text} from 'react-native';
+import { getDiceImg } from './diceImg';
 import useWindowDimensions from './window';
 import Clockwise_arrow from '../assets/clockwise_arrow.svg';
 import Skull_lose_dice from '../assets/skulls/skull_lose.svg';
 import Skull_win_dice from '../assets/skulls/skull_win.svg';
 
 export function Table(props) {
+  const curPlayerID = props.state.id;
   const fontSize = parseInt(getComputedStyle(document.documentElement).fontSize);
   const fontScale = 1.5;
   const textHeight = fontSize * fontScale;
@@ -111,7 +112,7 @@ export function Table(props) {
       infoBoxStyle.borderColor = 'black';
     }
 
-    if (id === props.state.id) {
+    if (id === curPlayerID) {
       infoBoxStyle.color = '#990012';
     }
 
@@ -123,11 +124,26 @@ export function Table(props) {
         skullImg = <img key={'skull_lose_' + angle} src={Skull_lose_dice} alt={id + 'skull'} style={skullStyle} className='fade-out'/>;
       }
     }
+
+    const renderPlayerInfoContent = () => {
+      if (props.state.othersDices && id !== curPlayerID) {
+        const playersDices = props.state.othersDices.filter(p => p.id === id)[0].dices;
+        return (
+          <span style={{padding: 0}}>
+            {playersDices.map((dice, idx) => <img src={getDiceImg(dice)} width={playerInfoBoxTextWidth/5} alt={'dice:' + angle + idx}/>) }
+          </span>
+        );
+      } else {
+        return (
+          <span className='player-text table-text' style={{width: playerInfoBoxTextWidth}}>{name}</span>
+        );
+      }
+    }
     
     return (
     <div key={angle}>
       <div key={'player_angle' + angle} style={infoBoxStyle} className={infoBoxStyle.className}>
-        <span className='player-text table-text' style={{playerInfoBoxTextWidth}}>{name}</span>
+        {renderPlayerInfoContent()}
       </div>
       {skullImg}
     </div>);

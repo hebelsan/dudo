@@ -54,7 +54,7 @@ io.on('connection', (socket) => {
     socket.on('updateGame', (data) => {
         const roomID = data.roomID;
         const game = GAMES[roomID];
-        game.updateGame(data);
+        game.updateGame(data.input);
         game.sendGameState(io);
     })
 

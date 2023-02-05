@@ -1,5 +1,5 @@
 import { Player } from "./Player.js";
-import { ROUND_STATE } from "./roundState.js";
+import { ROUND_STATE, ROUND_TYPE } from "./enums.js";
 
 export class GameState {
     #roomID;
@@ -10,17 +10,20 @@ export class GameState {
     #lastBid = undefined;
     #playerWon = undefined;
     #diceChange = undefined; // {playerID: '123', amount: -1}
+    #roundType = ROUND_TYPE.NORMAl;
 
     constructor(roomID, maxPlayerDices=5) {
         this.#roomID = roomID;
         this.#maxPlayerDices = maxPlayerDices;
     }
 
-    updateGame(data) {
+    updateGame(input) {
         console.log(`updateGame room: ${this.#roomID}`);
-        if (data.hasOwnProperty('bid')) {
-            const roundState = this.#getRoundState(data.bid);
-            this.#applyRoundState(roundState, data.bid);
+        if (input.hasOwnProperty('bid')) {
+            const roundState = this.#getRoundState(input.bid);
+            this.#applyState(roundState, input.bid);
+        } else if (input.hasOwnProperty('roundType')) {
+            this.#roundType = input.roundType;
         }
     }
 
@@ -35,6 +38,20 @@ export class GameState {
                 lastBid: this.#lastBid,
                 diceChange: this.#diceChange,
                 playerWon: this.#playerWon?.getID(),
+                startSpecialRound: false
+            }
+            if (this.#startSpecialRound()) {
+                sendState.dices = this.#maskDices(player.dices);
+                sendState.startSpecialRound = true;
+            }
+            if (this.#roundType == ROUND_TYPE.CLOSED) {
+                sendState.dices = this.#maskDices(player.dices);
+            }
+            if (this.#roundType == ROUND_TYPE.OPEN) {
+                sendState.dices = this.#maskDices(player.dices);
+                sendState.othersDices = this.#players
+                    .filter(p => p.getID() != sendState.id)
+                    .map(p => ({ id: p.getID(), dices: p.dices }));
             }
             io.to(player.getID()).emit(event, sendState);
         });
@@ -89,6 +106,11 @@ export class GameState {
     #isPlayerGameOver(arrIdx) {
         return (this.#players[arrIdx].numDices) === 0;
     }
+    #startSpecialRound() {
+        return this.#players[this.#curPlayer].numDices === 1 && 
+            this.#lastBid === undefined &&
+            this.#roundType === ROUND_TYPE.NORMAl;
+    }
     
     #playerRemoveDice(idx) {
         this.#players[idx].numDices--;
@@ -126,7 +148,7 @@ export class GameState {
             console.error("something is wrong with the bid...");
     }
 
-    #applyRoundState(roundState, newBid) {;
+    #applyState(roundState, newBid) {;
         const curPlayer = this.#curPlayer;
         const numPlayers = this.#players.length;
         switch(roundState) {
@@ -137,33 +159,39 @@ export class GameState {
             case ROUND_STATE.CUR_PLAYER_LOSE:
                 this.#playerRemoveDice(curPlayer);
                 this.#curPlayer = this.#nextPlayer(this.#players, curPlayer, numPlayers, 1);
-                this.#lastBid = undefined;
-                this.newDices();
+                this.#handleRoundFinish()
                 break;
             case ROUND_STATE.PLAYER_BEFORE_LOSE:
                 const playerBefore = this.#nextPlayer(this.#players, curPlayer-1, numPlayers, -1);
                 this.#playerRemoveDice(playerBefore);
-                this.#lastBid = undefined;
-                this.newDices();
                 if (!this.#isPlayerGameOver(playerBefore))
                     this.#curPlayer = playerBefore;
+                this.#handleRoundFinish()
                 break;
             case ROUND_STATE.WIN:
-                this.#lastBid = undefined;
                 this.#setDiceChange(this.#players[this.#curPlayer].getID(), 0);
-                this.newDices();
+                this.#handleRoundFinish()
                 break;
             case ROUND_STATE.WIN_GAIN:
                 this.#players[this.#curPlayer].numDices++;
                 this.#setDiceChange(this.#players[this.#curPlayer].getID(), 1)
-                this.#lastBid = undefined;
-                this.newDices();
                 this.#totalDices++;
+                this.#handleRoundFinish()
                 break;
         }
     }
 
+    #handleRoundFinish() {
+        this.#roundType = ROUND_TYPE.NORMAl;
+        this.#lastBid = undefined;
+        this.newDices();
+    }
+
     #setDiceChange(id, amount) {
         this.#diceChange = { playerID: id, amount: amount }
+    }
+
+    #maskDices(dices) {
+        return dices.map(() => 0);
     }
 };

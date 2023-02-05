@@ -38,8 +38,8 @@ const Game = ({socket}) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    const handleBidDecision = (decision) => {
-        socket.emit('updateGame', {roomID: roomCode, bid: decision});
+    const handleInput = (playerInput) => {
+        socket.emit('updateGame', {roomID: roomCode, input: playerInput});
     };
 
     const isValidBid = () => {
@@ -69,20 +69,42 @@ const Game = ({socket}) => {
     }
     
     const renderPlayerInput = () => {
-        if (isPlayersTurn() && !playerHasWon()) {
+        if (playerHasWon()) {
+            return <></>
+        }
+        else if (gameState.startSpecialRound) {
+            if (isPlayersTurn()) {
+                return renderChooseSpecialRound()
+            } else {
+                return <>{`${palyerName(gameState.curPlayer)} selects special round type`}</>
+            }
+        } else if (isPlayersTurn()) {
             return renderBidInput();
         } else {
             return <>{`it's ${palyerName(gameState.curPlayer)}'s turn`}</>
         }
     }
 
+    const renderChooseSpecialRound = () => {
+        return (
+            <div className='playerInput'>
+                <button type="button" onClick={() => handleInput({roundType: 'open'})}>
+                    OPEN ROUND
+                </button>
+                <button type="button" onClick={() => handleInput({roundType: 'closed'})}>
+                    CLOSED ROUND
+                </button>
+            </div>
+        );
+    }
+
     const renderBidInput = () => {
         return (
-            <div className='playerInput' style={{visibility: isPlayersTurn() && !playerHasWon() ? 'visible' : 'hidden' }}>
-                <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(true)}>
+            <div className='playerInput'>
+                <button type="button" disabled={!gameState.lastBid} onClick={() => handleInput({bid: true})}>
                     True
                 </button>
-                <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(false)}>
+                <button type="button" disabled={!gameState.lastBid} onClick={() => handleInput({bid: false})}>
                     False
                 </button>
                 <input type="number" id="multiplier" name="multiplier" min="1" max={gameState.totalDices} value={inputMulitplier} onChange={e => setInputMulitplier(parseInt(e.target.value))} />
@@ -94,7 +116,7 @@ const Game = ({socket}) => {
                     <option value="5">fives</option>
                     <option value="6">sixs</option>
                 </select>
-                <button type="button" disabled={!isValidBid()} onClick={() => handleBidDecision({times: inputMulitplier, dice: inputDice})}>
+                <button type="button" disabled={!isValidBid()} onClick={() => handleInput({bid: {times: inputMulitplier, dice: inputDice}})}>
                     Bid
                 </button>
             </div>
