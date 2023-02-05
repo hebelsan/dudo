@@ -75,35 +75,28 @@ export function Table(props) {
     const skullStyle = {
       width: skullWidth,
       height: skullWidth,
-      position: 'absolute', 
+      position: 'absolute',
+      padding: 0,
     }
 
     // x value
     const circleX = getCircleX(angle, r)
     if (circleX > ZERO_TRASHOLD) {
       infoBoxStyle.right = circleWidthFactor*r - circleX;
-      skullStyle.right = circleWidthFactor*r - circleX + skullWidth;
     } else if (circleX < -ZERO_TRASHOLD) {
       infoBoxStyle.left = circleWidthFactor*r + circleX;
-      skullStyle.left = circleWidthFactor*r + circleX + skullWidth;
     } else {
       infoBoxStyle.left = circleWidthFactor*r + circleX - playerInfoBoxWidth/2;
-      skullStyle.left = circleWidthFactor*r + circleX - skullWidth/2;
     }
     // y value
     const circleY = getCircleY(angle, r);
     if (circleY > ZERO_TRASHOLD) {
       infoBoxStyle.bottom = circleHeightFactor * r - circleY;
-      skullStyle.bottom = circleHeightFactor * r - circleY;
     } else if (circleY < -ZERO_TRASHOLD) {
       infoBoxStyle.top = circleHeightFactor * r + circleY;
-      skullStyle.top = circleHeightFactor * r + circleY;
     } else {
       infoBoxStyle.top = circleHeightFactor * r + circleY - playerInfoBoxHeight
-      skullStyle.top = circleHeightFactor * r + circleY - skullWidth;
     }
-
-    let skullImg = <></>;
 
     if (id === props.state.curPlayer) {
       infoBoxStyle.borderColor = 'transparent';
@@ -116,11 +109,12 @@ export function Table(props) {
       infoBoxStyle.color = '#990012';
     }
 
+    let skullImg =  <></>
     if (id === props.state?.diceChange?.playerID) {
-      if (props.state?.diceChange.amount === 1) {
+      if (props.state.diceChange.amount === 1) {
         skullImg = <img key={'skull_win_' + angle} src={Skull_win_dice} alt={id + 'skull'} style={skullStyle} className='fade-out'/>;
       }
-      if (props.state?.diceChange.amount === -1) {
+      if (props.state.diceChange.amount === -1) {
         skullImg = <img key={'skull_lose_' + angle} src={Skull_lose_dice} alt={id + 'skull'} style={skullStyle} className='fade-out'/>;
       }
     }
@@ -144,8 +138,8 @@ export function Table(props) {
     <div key={angle}>
       <div key={'player_angle' + angle} style={infoBoxStyle} className={infoBoxStyle.className}>
         {renderPlayerInfoContent()}
+        {skullImg}
       </div>
-      {skullImg}
     </div>);
   }
   

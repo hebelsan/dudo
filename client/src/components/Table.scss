@@ -10,6 +10,7 @@
   -o-animation: fadeOut ease 3s;
   -ms-animation: fadeOut ease 3s;
   animation-fill-mode: forwards;
+  transform-origin: bottom;
 }
 
 @keyframes fadeOut {
