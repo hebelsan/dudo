@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import {View} from 'react-native';
 import { useLocation } from 'react-router-dom';
 import * as bid from '../utils/bid';
-import { getDiceImg } from '../utils/images';
+import { getDiceImg } from '../components/diceImg';
+import { Table } from '../components/Table';
 
 /**
 GameState:
@@ -19,12 +21,13 @@ GameState:
 const Game = ({socket}) => {
     const location = useLocation();
     const [gameState, setGameState] = useState(location.state.gameState);
-    const playerName = location.state.playerName;
     const playerID = location.state.playerID;
     const roomCode = location.state.roomCode;
     const players = location.state.players;
     const [inputMulitplier, setInputMulitplier] = useState(1);
     const [inputDice, setInputDice] = useState(1);
+
+    const inputHeightAmount = 0.25;
     
     useEffect(() => {
         socket.on('newGameState', (newGameState) => {
@@ -53,7 +56,7 @@ const Game = ({socket}) => {
     }
 
     const playerHasWon = () => {
-        return gameState.won === playerID;
+        return gameState.playerWon === playerID;
     }
 
     const playerHasLost = () => {
@@ -67,38 +70,36 @@ const Game = ({socket}) => {
             return  <b>you win!</b>
         } else {
             return (
-                <div className="GameInfo">
-                    <div>Your Name: {playerName}</div>
-                    <div>Total number of dices: {gameState.totalDices}</div>
-                    <div>Current Player: {gameState.curPlayer}</div>
-                    <div>your turn: {String(gameState.turn)}</div>
-                    <div>last bid: {JSON.stringify(gameState.lastBid)}</div>
-                    <div>{players.map((p) => p.name)}</div>
-
-                    <div>your dices: {gameState.dices}</div>
-                    <div>{gameState.dices.map((dice, idx) => <img key={'dice' + idx} src={getDiceImg(dice)} width='50' alt={'dice' + idx}/>) }</div>
-        
-                    <div className='playerInput' style={{visibility: isPlayersTurn() && !playerHasWon() ? 'visible' : 'hidden' }}>
-                        <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(true)}>
-                            True
-                        </button>
-                        <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(false)}>
-                            False
-                        </button>
-                        <input type="number" id="multiplier" name="multiplier" min="1" max={gameState.totalDices} value={inputMulitplier} onChange={e => setInputMulitplier(parseInt(e.target.value))} />
-                        <select name="diceValue" id="diceValue" onChange={e => setInputDice(parseInt(e.target.value))} value={inputDice}>
-                            <option value="1">ones</option>
-                            <option value="2">twos</option>
-                            <option value="3">threes</option>
-                            <option value="4">fours</option>
-                            <option value="5">fives</option>
-                            <option value="6">sixs</option>
-                        </select>
-                        <button type="button" disabled={!isValidBid()} onClick={() => handleBidDecision({times: inputMulitplier, dice: inputDice})}>
-                            Bid
-                        </button>
-                    </div>
-                </div>
+                <View className="GameInfo" style={{width: '100%', height:'100%', position:'absolute', flex: 1}}>
+                    <View style={{width: '100%', height: inputHeightAmount * 100 + '%'}}>
+                        <div>last bid: {JSON.stringify(gameState.lastBid)}</div>
+                        <div>{gameState.dices.map((dice, idx) => <img key={'dice' + idx} src={getDiceImg(dice)} width='50' alt={'dice' + idx}/>) }</div>
+            
+                        <div className='playerInput' style={{visibility: isPlayersTurn() && !playerHasWon() ? 'visible' : 'hidden' }}>
+                            <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(true)}>
+                                True
+                            </button>
+                            <button type="button" disabled={!gameState.lastBid} onClick={() => handleBidDecision(false)}>
+                                False
+                            </button>
+                            <input type="number" id="multiplier" name="multiplier" min="1" max={gameState.totalDices} value={inputMulitplier} onChange={e => setInputMulitplier(parseInt(e.target.value))} />
+                            <select name="diceValue" id="diceValue" onChange={e => setInputDice(parseInt(e.target.value))} value={inputDice}>
+                                <option value="1">ones</option>
+                                <option value="2">twos</option>
+                                <option value="3">threes</option>
+                                <option value="4">fours</option>
+                                <option value="5">fives</option>
+                                <option value="6">sixs</option>
+                            </select>
+                            <button type="button" disabled={!isValidBid()} onClick={() => handleBidDecision({times: inputMulitplier, dice: inputDice})}>
+                                Bid
+                            </button>
+                        </div>
+                    </View>
+                    <View style={{flex: 1}}>
+                        <Table players={players} state={gameState} heightAmount={1-inputHeightAmount} />
+                    </View>
+                </View>
             )
         }
     }

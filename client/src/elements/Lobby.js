@@ -35,7 +35,6 @@ const Lobby = ({socket}) => {
     useEffect(() => {
         socket.on('lobbyFollowGame', (gameState) => {
             navigate(`/game?roomCode=${roomCode}`, {state:{
-                playerName: playerName,
                 playerID: playerID,
                 gameState: gameState, 
                 roomCode: roomCode,

@@ -1,0 +1,128 @@
+/* 
+ * 
+ * skull fadout
+ *
+*/
+.fade-out {
+  animation: fadeOut ease 3s;
+  -webkit-animation: fadeOut ease 3s;
+  -moz-animation: fadeOut ease 3s;
+  -o-animation: fadeOut ease 3s;
+  -ms-animation: fadeOut ease 3s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeOut {
+  0% { opacity:1; transform: scale(1); }
+  100% { opacity:0; transform: scale(2); }
+}
+
+@-moz-keyframes fadeOut {
+  0% { opacity:1; transform: scale(1); }
+  100% { opacity:0; transform: scale(2); }
+}
+
+@-webkit-keyframes fadeOut {
+  0% { opacity:1; transform: scale(1); }
+  100% { opacity:0; transform: scale(2); }
+}
+
+@-o-keyframes fadeOut {
+  0% { opacity:1; transform: scale(1); }
+  100% { opacity:0; transform: scale(2); }
+}
+
+@-ms-keyframes fadeOut {
+  0% { opacity:1; transform: scale(1); }
+  100% { opacity:0; transform: scale(2); }
+}
+
+
+/* 
+ * 
+ * moving border
+ *
+*/
+.moving-border {
+  border-color: black;
+  animation-name: flash_border;
+  animation-duration: 3.5s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  -webkit-animation-name: flash_border;
+  -webkit-animation-duration: 3.5s;
+  -webkit-animation-timing-function: linear;
+  -webkit-animation-iteration-count: infinite;
+  -moz-animation-name: flash_border;
+  -moz-animation-duration: 3.5s;
+  -moz-animation-timing-function: linear;
+  -moz-animation-iteration-count: infinite;
+}
+
+@keyframes flash_border {
+  0% {
+    border-color: white;
+  }
+  50% {
+    border-color: black;
+  }
+  100% {
+    border-color: white;
+  }
+}
+
+@-webkit-keyframes flash_border {
+  0% {
+    border-color: white;
+  }
+  50% {
+    border-color: black;
+  }
+  100% {
+    border-color: white;
+  }
+}
+
+@-moz-keyframes flash_border {
+  0% {
+    border-color: white;
+  }
+  50% {
+    border-color: black;
+  }
+  100% {
+    border-color: white;
+  }
+}
+
+
+/* 
+ * limit player box text
+*/
+.player-text {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 
+ * general
+*/
+
+.table {
+  position: relative;
+  border: 1px solid black; 
+  margin: auto;
+}
+
+.number-dices-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+}
+
+.table-text {
+  font-size: 1rem;
+}
