@@ -1,3 +1,7 @@
 .App {
   text-align: center;
 }
+
+.btn.btn-dark[disabled] {
+  background-color: #bdbdbd;
+}

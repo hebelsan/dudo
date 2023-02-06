@@ -44,14 +44,24 @@ const Lobby = ({socket}) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playerName, playerID, players])
 
+    const copyRoomUrl = () => {
+        navigator.clipboard.writeText(window.location.href);
+    }
+
 
     return (
         <div className='Lobby'>
             <h1>Lobby</h1>
-            <button type="button" onClick={handleStartGame} value={socket} disabled={players.length<=1}>
+
+            <button class="btn btn-dark w-75" type="button" onClick={handleStartGame} value={socket} disabled={players.length<=1}>
                 START GAME
             </button>
+
             {players.map((u) => <li key={u.id}>name: {u.name} id: {u.id}</li>)}
+
+            <button class="btn btn-secondary btn-sm" type="button" onClick={copyRoomUrl}>
+                Copy Room Link
+            </button>
         </div>
     )
 }

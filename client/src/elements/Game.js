@@ -101,10 +101,10 @@ const Game = ({socket}) => {
     const renderBidInput = () => {
         return (
             <div className='playerInput'>
-                <button type="button" disabled={!gameState.lastBid} onClick={() => handleInput({bid: true})}>
+                <button class="btn btn-dark btn-sm" type="button" disabled={!gameState.lastBid} onClick={() => handleInput({bid: true})}>
                     True
                 </button>
-                <button type="button" disabled={!gameState.lastBid} onClick={() => handleInput({bid: false})}>
+                <button class="btn btn-dark btn-sm" type="button" disabled={!gameState.lastBid} onClick={() => handleInput({bid: false})}>
                     False
                 </button>
                 <input type="number" id="multiplier" name="multiplier" min="1" max={gameState.totalDices} value={inputMulitplier} onChange={e => setInputMulitplier(parseInt(e.target.value))} />
@@ -116,7 +116,7 @@ const Game = ({socket}) => {
                     <option value="5">fives</option>
                     <option value="6">sixs</option>
                 </select>
-                <button type="button" disabled={!isValidBid()} onClick={() => handleInput({bid: {times: inputMulitplier, dice: inputDice}})}>
+                <button class="btn btn-dark btn-sm" type="button" disabled={!isValidBid()} onClick={() => handleInput({bid: {times: inputMulitplier, dice: inputDice}})}>
                     Bid
                 </button>
             </div>
